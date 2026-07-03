@@ -29,15 +29,15 @@ Ziel: Alle 23 Business Rules aus `SPEC.md` §3 sind aktiv.
 
 | ID | Feature | Business Rule | Status |
 |---|---|---|---|
-| BV-008 | Keine Doppelbelegung — Tisch + Zeitfenster-Konflikt prüfen | BR #16, #17 | ☐ |
-| BV-009 | No-Show automatisch setzen + 20-Min-Tisch-Karenz | BR #14, #15 | ☐ |
-| BV-010 | Bella-Card-Automatik — ab 10 Besuchen aktivieren, 15 % Rabatt auf Rechnung (inkl. Getränke, beide Standorte) | BR #3, #4, #5 | ☐ |
-| BV-011 | Öffnungszeiten + Küchenschluss — neue Bestellungen + Reservierungen sperren | BR #9, #10 | ☐ |
-| BV-012 | Grillgerichte in Spandau sperren (baulich kein Grill) | BR #8 | ☐ |
-| BV-013 | Bestellstatus-Workflow: Änderung nur vor Küchenstart; Getränke jederzeit ergänzbar | BR #11, #12 | ☐ |
-| BV-014 | Ausverkauft-Markierung sofort bei allen Kellnern sichtbar | BR #13 | ☐ |
-| BV-015 | Gruppenbereich nur Kreuzberg buchbar | BR #7 | ☐ |
-| BV-016 | Rollenbasierter Zugriff durchsetzen (Chef alles · Manager Standort + Karte · Bedienung Bestellungen + Res.) | BR #21 | ☐ |
+| BV-008 | Keine Doppelbelegung — Tisch + Zeitfenster-Konflikt prüfen | BR #16, #17 | ✓ |
+| BV-009 | No-Show automatisch setzen + 20-Min-Tisch-Karenz | BR #14, #15 | ✓ |
+| BV-010 | Bella-Card-Automatik — ab 10 Besuchen aktivieren, 15 % Rabatt auf Rechnung (inkl. Getränke, beide Standorte) | BR #3, #4, #5 | ✓ |
+| BV-011 | Öffnungszeiten + Küchenschluss — neue Bestellungen + Reservierungen sperren | BR #9, #10 | ✓ |
+| BV-012 | Grillgerichte in Spandau sperren (baulich kein Grill) | BR #8 | ✓ |
+| BV-013 | Bestellstatus-Workflow: Änderung nur vor Küchenstart; Getränke jederzeit ergänzbar | BR #11, #12 | ✓ |
+| BV-014 | Ausverkauft-Markierung sofort bei allen Kellnern sichtbar | BR #13 | ✓ |
+| BV-015 | Gruppenbereich nur Kreuzberg buchbar | BR #7 | ✓ |
+| BV-016 | Rollenbasierter Zugriff durchsetzen (Chef alles · Manager Standort + Karte · Bedienung Bestellungen + Res.) | BR #21 | ✓ |
 
 ---
 
