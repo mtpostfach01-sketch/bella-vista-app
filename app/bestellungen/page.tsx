@@ -53,7 +53,14 @@ export default async function BestellungenPage() {
               <div key={b.id} className="flex items-center justify-between px-4 py-3">
                 <div>
                   <div className="font-medium text-gray-900">
-                    {b.standort.name} · Tisch {b.tisch.nummer}
+                    {b.standort.name} ·{" "}
+                    {b.tisch ? `Tisch ${b.tisch.nummer}` : ""}
+                    {/* BV-107: Abholung-Badge */}
+                    {(b as { bestellart?: string }).bestellart === "ABHOLUNG" && (
+                      <span className="ml-1 text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                        Abholung
+                      </span>
+                    )}
                     <span
                       className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
                         statusBadge[b.status] ?? "bg-gray-100 text-gray-500"

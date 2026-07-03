@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { bestellungAnlegen } from "../actions";
+import { BestellartAuswahl } from "./BestellartAuswahl";
 
 const FEHLERMELDUNGEN: Record<string, string> = {
   kueche_geschlossen:
@@ -78,25 +79,18 @@ export default async function BestellungNeuPage({
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Tisch *
-          </label>
-          <select
-            name="tisch_id"
-            required
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
-          >
-            <option value="">Tisch wählen …</option>
-            {standorte.map((s) =>
-              s.tische.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {s.name} — Tisch {t.nummer} ({t.kapazitaet} Plätze)
-                </option>
-              ))
-            )}
-          </select>
-        </div>
+        {/* BV-107: Bestellart TISCH / ABHOLUNG (interaktiv) */}
+        <BestellartAuswahl
+          standorte={standorte.map((s) => ({
+            id: s.id,
+            name: s.name,
+            tische: s.tische.map((t) => ({
+              id: t.id,
+              nummer: t.nummer,
+              kapazitaet: t.kapazitaet,
+            })),
+          }))}
+        />
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">

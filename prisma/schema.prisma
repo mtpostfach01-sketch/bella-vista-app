@@ -19,6 +19,7 @@ model Standort {
   speisekarte    Speisekarte?
   bestellungen   Bestellung[]
   mitarbeiter    Mitarbeiter[]
+  warteliste     Warteliste[]
 }
 
 // ─── Gast (standortübergreifend, ADR-003) ─────────────────────
@@ -34,6 +35,7 @@ model Gast {
 
   reservierungen Reservierung[]
   rechnungen     Rechnung[]
+  warteliste     Warteliste[]
 }
 
 // ─── Bereich ──────────────────────────────────────────────────
@@ -158,11 +160,12 @@ model Tagesgericht {
 model Bestellung {
   id             Int         @id @default(autoincrement())
   status         String      @default("OFFEN") // OFFEN | IN_ZUBEREITUNG | SERVIERT | BEZAHLT | STORNIERT
+  bestellart     String      @default("TISCH") // TISCH | ABHOLUNG (BV-107)
   erstellt_am    DateTime    @default(now())
-  tisch_id       Int
+  tisch_id       Int?        // optional: null bei Abholung (BV-107)
   standort_id    Int
   mitarbeiter_id Int
-  tisch          Tisch       @relation(fields: [tisch_id], references: [id])
+  tisch          Tisch?      @relation(fields: [tisch_id], references: [id])
   standort       Standort    @relation(fields: [standort_id], references: [id])
   mitarbeiter    Mitarbeiter @relation(fields: [mitarbeiter_id], references: [id])
 
@@ -211,4 +214,16 @@ model Zahlung {
   zahlungsart String   // BAR | KARTE
   rechnung_id Int
   rechnung    Rechnung @relation(fields: [rechnung_id], references: [id])
+}
+
+// ─── Warteliste (BV-102) ──────────────────────────────────────
+model Warteliste {
+  id                    Int      @id @default(autoincrement())
+  gewuenschte_personenzahl Int
+  notiz                 String?
+  erstellt_am           DateTime @default(now())
+  gast_id               Int
+  standort_id           Int
+  gast                  Gast     @relation(fields: [gast_id], references: [id])
+  standort              Standort @relation(fields: [standort_id], references: [id])
 }

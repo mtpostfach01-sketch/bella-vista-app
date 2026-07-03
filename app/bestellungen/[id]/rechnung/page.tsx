@@ -56,7 +56,8 @@ export default async function RechnungPage({
         </Link>
       </div>
       <p className="text-sm text-gray-500 mb-6">
-        {bestellung.standort.name} · Tisch {bestellung.tisch.nummer} ·
+        {bestellung.standort.name}
+        {bestellung.tisch ? ` · Tisch ${bestellung.tisch.nummer}` : " · Abholung"} ·
         Bestellung #{bestellung.id}
       </p>
 

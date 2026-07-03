@@ -6,7 +6,12 @@ import { redirect } from "next/navigation";
 import { istKuecheOffen } from "@/lib/oeffnungszeiten";
 
 export async function bestellungAnlegen(formData: FormData) {
-  const tisch_id = parseInt(formData.get("tisch_id") as string, 10);
+  const tisch_id_raw = formData.get("tisch_id") as string;
+  const bestellart = (formData.get("bestellart") as string) || "TISCH";
+  const tisch_id =
+    bestellart === "ABHOLUNG" || !tisch_id_raw
+      ? null
+      : parseInt(tisch_id_raw, 10);
   const mitarbeiter_id = parseInt(formData.get("mitarbeiter_id") as string, 10);
   const standort_id = parseInt(formData.get("standort_id") as string, 10);
 
@@ -51,7 +56,8 @@ export async function bestellungAnlegen(formData: FormData) {
 
   const bestellung = await db.bestellung.create({
     data: {
-      tisch_id,
+      tisch_id: tisch_id ?? null,
+      bestellart,
       mitarbeiter_id,
       standort_id,
       status: "OFFEN",

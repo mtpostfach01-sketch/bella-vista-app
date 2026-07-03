@@ -113,7 +113,15 @@ export default async function BestellungDetailPage({
       </div>
 
       <div className="text-sm text-gray-500 mb-4">
-        {bestellung.standort.name} · Tisch {bestellung.tisch.nummer} ·{" "}
+        {bestellung.standort.name}
+        {bestellung.tisch ? ` · Tisch ${bestellung.tisch.nummer}` : ""}
+        {/* BV-107: Abholung-Badge */}
+        {(bestellung as { bestellart?: string }).bestellart === "ABHOLUNG" && (
+          <span className="ml-1 text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+            Abholung
+          </span>
+        )}
+        {" · "}
         {bestellung.mitarbeiter.vorname} {bestellung.mitarbeiter.nachname} · {zeitStr}
         <span
           className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
