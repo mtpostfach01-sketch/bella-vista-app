@@ -12,7 +12,7 @@ Ziel: Die App läuft. Jede Entität existiert. Formulare funktionieren.
 
 | ID | Feature | Entitäten | Status |
 |---|---|---|---|
-| BV-001 | Gast anlegen, per Telefonnummer suchen, bearbeiten (Name, Notiz, Lieblingstisch) | Gast | ☐ |
+| BV-001 | Gast anlegen, per Telefonnummer suchen, bearbeiten (Name, Notiz, Lieblingstisch) | Gast | ✓ |
 | BV-002 | Tische anlegen und verwalten je Standort (Nummer, Kapazität, Bereich, Status) | Tisch, Bereich, Standort | ☐ |
 | BV-003 | Reservierung anlegen + Tisch manuell zuweisen (ohne Konfliktprüfung) | Reservierung, Tisch, Gast | ☐ |
 | BV-004 | Speisekarte: Gerichte, Kategorien, Allergene anlegen je Standort (CRUD) | Speisekarte, Gericht, Kategorie, Allergen, Tagesgericht | ☐ |
