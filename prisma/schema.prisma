@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Standort ─────────────────────────────────────────────────
+model Standort {
+  id      Int    @id @default(autoincrement())
+  name    String @unique
+  adresse String
+
+  bereiche       Bereich[]
+  tische         Tisch[]
+  reservierungen Reservierung[]
+  speisekarte    Speisekarte?
+  bestellungen   Bestellung[]
+  mitarbeiter    Mitarbeiter[]
+}
+
+// ─── Gast (standortübergreifend, ADR-003) ─────────────────────
+model Gast {
+  id            Int     @id @default(autoincrement())
+  vorname       String
+  nachname      String
+  telefon       String  @unique
+  email         String?
+  notiz         String?
+  bella_card    Boolean @default(false)
+  besuchsanzahl Int     @default(0)
+
+  reservierungen Reservierung[]
+  rechnungen     Rechnung[]
+}
+
+// ─── Bereich ──────────────────────────────────────────────────
+model Bereich {
+  id          Int      @id @default(autoincrement())
+  name        String
+  standort_id Int
+  standort    Standort @relation(fields: [standort_id], references: [id])
+
+  tische Tisch[]
+}
+
+// ─── Tisch ────────────────────────────────────────────────────
+model Tisch {
+  id          Int      @id @default(autoincrement())
+  nummer      Int
+  kapazitaet  Int
+  status      String   @default("FREI") // FREI | BESETZT | RESERVIERT | GESPERRT
+  bereich_id  Int
+  standort_id Int
+  bereich     Bereich  @relation(fields: [bereich_id], references: [id])
+  standort    Standort @relation(fields: [standort_id], references: [id])
+
+  reservierungen Reservierung[]
+  bestellungen   Bestellung[]
+
+  @@unique([nummer, standort_id])
+}
+
+// ─── Reservierung ─────────────────────────────────────────────
+model Reservierung {
+  id             Int      @id @default(autoincrement())
+  datum_uhrzeit  DateTime
+  personenanzahl Int
+  status         String   @default("BESTAETIGT") // BESTAETIGT | NO_SHOW | STORNIERT | ERSCHIENEN
+  notiz          String?
+  erstellt_am    DateTime @default(now())
+  gast_id        Int
+  tisch_id       Int?
+  standort_id    Int
+  gast           Gast     @relation(fields: [gast_id], references: [id])
+  tisch          Tisch?   @relation(fields: [tisch_id], references: [id])
+  standort       Standort @relation(fields: [standort_id], references: [id])
+}
+
+// ─── Mitarbeiter ──────────────────────────────────────────────
+model Mitarbeiter {
+  id          Int       @id @default(autoincrement())
+  vorname     String
+  nachname    String
+  email       String    @unique
+  rolle       String    // CHEF | MANAGER | BEDIENUNG
+  standort_id Int?      // null = Chef (alle Standorte)
+  standort    Standort? @relation(fields: [standort_id], references: [id])
+
+  bestellungen Bestellung[]
+}
+
+// ─── Speisekarte ──────────────────────────────────────────────
+model Speisekarte {
+  id          Int      @id @default(autoincrement())
+  standort_id Int      @unique
+  standort    Standort @relation(fields: [standort_id], references: [id])
+
+  kategorien Kategorie[]
+}
+
+model Kategorie {
+  id             Int         @id @default(autoincrement())
+  name           String
+  speisekarte_id Int
+  speisekarte    Speisekarte @relation(fields: [speisekarte_id], references: [id])
+
+  gerichte Gericht[]
+}
+
+// ─── Allergen ─────────────────────────────────────────────────
+model Allergen {
+  id      Int    @id @default(autoincrement())
+  name    String
+  kuerzel String @unique
+
+  gerichte GerichtAllergen[]
+}
+
+// ─── Gericht ──────────────────────────────────────────────────
+model Gericht {
+  id               Int       @id @default(autoincrement())
+  name             String
+  beschreibung     String?
+  preis            Float
+  verfuegbar       Boolean   @default(true)
+  ist_grillgericht Boolean   @default(false) // BR #8: nur Kreuzberg
+  kategorie_id     Int
+  kategorie        Kategorie @relation(fields: [kategorie_id], references: [id])
+
+  allergene         GerichtAllergen[]
+  bestellpositionen Bestellposition[]
+  tagesgerichte     Tagesgericht[]
+}
+
+model GerichtAllergen {
+  gericht_id  Int
+  allergen_id Int
+  gericht     Gericht  @relation(fields: [gericht_id], references: [id])
+  allergen    Allergen @relation(fields: [allergen_id], references: [id])
+
+  @@id([gericht_id, allergen_id])
+}
+
+model Tagesgericht {
+  id          Int      @id @default(autoincrement())
+  datum       DateTime
+  standort_id Int
+  gericht_id  Int
+  gericht     Gericht  @relation(fields: [gericht_id], references: [id])
+
+  @@unique([gericht_id, datum, standort_id])
+}
+
+// ─── Bestellung ───────────────────────────────────────────────
+model Bestellung {
+  id             Int         @id @default(autoincrement())
+  status         String      @default("OFFEN") // OFFEN | IN_ZUBEREITUNG | SERVIERT | BEZAHLT | STORNIERT
+  erstellt_am    DateTime    @default(now())
+  tisch_id       Int
+  standort_id    Int
+  mitarbeiter_id Int
+  tisch          Tisch       @relation(fields: [tisch_id], references: [id])
+  standort       Standort    @relation(fields: [standort_id], references: [id])
+  mitarbeiter    Mitarbeiter @relation(fields: [mitarbeiter_id], references: [id])
+
+  positionen     Bestellposition[]
+  kuechenauftrag Kuechenauftrag?
+  rechnungen     Rechnung[]
+}
+
+model Bestellposition {
+  id            Int        @id @default(autoincrement())
+  menge         Int
+  notiz         String?
+  status        String     @default("OFFEN") // OFFEN | IN_ZUBEREITUNG | FERTIG
+  bestellung_id Int
+  gericht_id    Int
+  bestellung    Bestellung @relation(fields: [bestellung_id], references: [id])
+  gericht       Gericht    @relation(fields: [gericht_id], references: [id])
+}
+
+// ─── Küchenauftrag ────────────────────────────────────────────
+model Kuechenauftrag {
+  id            Int        @id @default(autoincrement())
+  status        String     @default("OFFEN") // OFFEN | IN_ARBEIT | FERTIG
+  erstellt_am   DateTime   @default(now())
+  bestellung_id Int        @unique
+  bestellung    Bestellung @relation(fields: [bestellung_id], references: [id])
+}
+
+// ─── Rechnung + Zahlung ───────────────────────────────────────
+model Rechnung {
+  id                Int        @id @default(autoincrement())
+  bella_card_rabatt Boolean    @default(false)
+  gesamt_betrag     Float
+  erstellt_am       DateTime   @default(now())
+  bestellung_id     Int
+  gast_id           Int?
+  bestellung        Bestellung @relation(fields: [bestellung_id], references: [id])
+  gast              Gast?      @relation(fields: [gast_id], references: [id])
+
+  zahlungen Zahlung[]
+}
+
+model Zahlung {
+  id          Int      @id @default(autoincrement())
+  betrag      Float
+  zahlungsart String   // BAR | KARTE
+  rechnung_id Int
+  rechnung    Rechnung @relation(fields: [rechnung_id], references: [id])
+}
