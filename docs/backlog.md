@@ -18,7 +18,7 @@ Ziel: Die App läuft. Jede Entität existiert. Formulare funktionieren.
 | BV-004 | Speisekarte: Gerichte, Kategorien, Allergene anlegen je Standort (CRUD) | Speisekarte, Gericht, Kategorie, Allergen, Tagesgericht | ✓ |
 | BV-005 | Bestellung aufnehmen am Tisch → Küchenauftrag erstellen (ohne Sperren) | Bestellung, Bestellposition, Küchenauftrag | ✓ |
 | BV-006 | Rechnung erstellen + Splitting (bar / Karte je Teilrechnung, ohne Rabatt) | Rechnung, Zahlung | ✓ |
-| BV-007 | Mitarbeiter anlegen + Rolle zuweisen (Stammdaten, ohne Zugriffsschutz) | Mitarbeiter, Rolle | ☐ |
+| BV-007 | Mitarbeiter anlegen + Rolle zuweisen (Stammdaten, ohne Zugriffsschutz) | Mitarbeiter, Rolle | ✓ |
 
 ---
 
