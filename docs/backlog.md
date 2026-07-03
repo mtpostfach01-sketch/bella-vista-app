@@ -16,7 +16,7 @@ Ziel: Die App läuft. Jede Entität existiert. Formulare funktionieren.
 | BV-002 | Tische anlegen und verwalten je Standort (Nummer, Kapazität, Bereich, Status) | Tisch, Bereich, Standort | ✓ |
 | BV-003 | Reservierung anlegen + Tisch manuell zuweisen (ohne Konfliktprüfung) | Reservierung, Tisch, Gast | ✓ |
 | BV-004 | Speisekarte: Gerichte, Kategorien, Allergene anlegen je Standort (CRUD) | Speisekarte, Gericht, Kategorie, Allergen, Tagesgericht | ✓ |
-| BV-005 | Bestellung aufnehmen am Tisch → Küchenauftrag erstellen (ohne Sperren) | Bestellung, Bestellposition, Küchenauftrag | ☐ |
+| BV-005 | Bestellung aufnehmen am Tisch → Küchenauftrag erstellen (ohne Sperren) | Bestellung, Bestellposition, Küchenauftrag | ✓ |
 | BV-006 | Rechnung erstellen + Splitting (bar / Karte je Teilrechnung, ohne Rabatt) | Rechnung, Zahlung | ☐ |
 | BV-007 | Mitarbeiter anlegen + Rolle zuweisen (Stammdaten, ohne Zugriffsschutz) | Mitarbeiter, Rolle | ☐ |
 
