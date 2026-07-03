@@ -22,12 +22,20 @@ export default async function ReservierungenPage() {
     <div className="max-w-2xl">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold text-gray-900">Reservierungen</h1>
-        <Link
-          href="/reservierungen/neu"
-          className="px-3 py-1.5 bg-gray-900 text-white text-sm rounded-md hover:bg-gray-700"
-        >
-          + Reservierung anlegen
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/reservierungen/warteliste"
+            className="px-3 py-1.5 border border-gray-300 text-gray-600 text-sm rounded-md hover:bg-gray-50"
+          >
+            Warteliste
+          </Link>
+          <Link
+            href="/reservierungen/neu"
+            className="px-3 py-1.5 bg-gray-900 text-white text-sm rounded-md hover:bg-gray-700"
+          >
+            + Reservierung anlegen
+          </Link>
+        </div>
       </div>
 
       {reservierungen.length === 0 ? (
