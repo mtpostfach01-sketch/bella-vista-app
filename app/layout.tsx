@@ -67,6 +67,15 @@ export default async function RootLayout({
           >
             Mitarbeiter
           </Link>
+          {/* BV-017: Dashboard nur für CHEF und MANAGER */}
+          {aktiver && aktiver.rolle !== "BEDIENUNG" && (
+            <Link
+              href="/dashboard"
+              className="text-sm text-gray-600 hover:text-gray-900"
+            >
+              Dashboard
+            </Link>
+          )}
 
           {/* BV-016: Session-Anzeige in Nav */}
           <div className="ml-auto flex items-center gap-2">

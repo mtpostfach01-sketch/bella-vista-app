@@ -47,15 +47,15 @@ Ziel: Alle 23 Business Rules aus `SPEC.md` §3 sind aktiv.
 
 | ID | Feature | Abhängigkeit / Offene Frage | Status |
 |---|---|---|---|
-| BV-017 | Chef-Dashboard — Reservierungen heute + Auslastung je Standort (standortübergreifend) | ADR-001 · baut auf Phase 1+2 | ☐ |
-| BV-101 | SMS-Erinnerung am Vortag einer Reservierung | BR #22 · extern: SMS-Provider · Benachrichtigungs-Ablauf offen | ☐ |
-| BV-102 | Warteliste für freie Tische | BR #26 · Marco unentschlossen · Benachrichtigung offen | ☐ |
+| BV-017 | Chef-Dashboard — Reservierungen heute + Auslastung je Standort (standortübergreifend) | ADR-001 · baut auf Phase 1+2 | ✓ |
+| BV-101 | SMS-Erinnerung am Vortag einer Reservierung | BR #22 · extern: SMS-Provider · Benachrichtigungs-Ablauf offen | ✗ |
+| BV-102 | Warteliste für freie Tische | BR #26 · Marco unentschlossen · Benachrichtigung offen | ✓ |
 | BV-103 | Schichtplanung + automatischer Trinkgeld-Vorschlag (Chef bestätigt) | BR #20 · Verteilschlüssel offen (`SPEC.md` §6/4) | ☐ |
-| BV-104 | Catering-Modul (Firmenkunden, Events, Lieferadresse) | W6 · Entitäten: Catering-Auftrag, Firmenkunde | ☐ |
-| BV-105 | Gruppenmenü-Automatik ab 8 Personen + optionale Anzahlung | BR #6, #23 · Details offen (`SPEC.md` §6/5) | ☐ |
-| BV-106 | Erweiterte Kennzahlen (Top-Gerichte, Umsatz/Kellner, No-Show-Quote) | Baut auf Phase-1-Daten auf | ☐ |
-| BV-107 | Abholung als Bestellart (für korrekten Umsatz, W8) | Bestellart-Feld in Entität Bestellung | ☐ |
-| BV-108 | TSE-Kassenanbindung | ADR-004 · Schnittstelle mit Marco / TSE-Hersteller klären | ☐ |
+| BV-104 | Catering-Modul (Firmenkunden, Events, Lieferadresse) | W6 · Entitäten: Catering-Auftrag, Firmenkunde | ✗ |
+| BV-105 | Gruppenmenü-Automatik ab 8 Personen + optionale Anzahlung | BR #6, #23 · Details offen (`SPEC.md` §6/5) | ✗ |
+| BV-106 | Erweiterte Kennzahlen (Top-Gerichte, Umsatz/Kellner, No-Show-Quote) | Baut auf Phase-1-Daten auf | ✓ |
+| BV-107 | Abholung als Bestellart (für korrekten Umsatz, W8) | Bestellart-Feld in Entität Bestellung | ✓ |
+| BV-108 | TSE-Kassenanbindung | ADR-004 · Schnittstelle mit Marco / TSE-Hersteller klären | ✗ |
 | BV-109 | Gerichtsfotos in der Speisekarte | Nice-to-have | ☐ |
 
 ---
