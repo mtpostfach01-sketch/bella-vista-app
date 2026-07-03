@@ -64,3 +64,40 @@ export async function bestellungStatusAendern(id: number, formData: FormData) {
   revalidatePath("/bestellungen");
   redirect("/bestellungen");
 }
+
+// ─── Rechnung erstellen ───────────────────────────────────────
+export async function rechnungErstellen(bestellung_id: number, formData: FormData) {
+  const gesamt_betrag = parseFloat(formData.get("gesamt_betrag") as string);
+  const gast_id_raw = formData.get("gast_id") as string;
+  const gast_id = gast_id_raw ? parseInt(gast_id_raw, 10) : null;
+
+  const rechnung = await db.rechnung.create({
+    data: {
+      bestellung_id,
+      gesamt_betrag,
+      gast_id,
+    },
+  });
+
+  // Bestellung auf BEZAHLT setzen
+  await db.bestellung.update({
+    where: { id: bestellung_id },
+    data: { status: "BEZAHLT" },
+  });
+
+  revalidatePath(`/bestellungen/${bestellung_id}`);
+  redirect(`/bestellungen/${bestellung_id}/rechnung?rechnung_id=${rechnung.id}`);
+}
+
+// ─── Zahlung hinzufügen ────────────────────────────────────────
+export async function zahlungHinzufuegen(rechnung_id: number, bestellung_id: number, formData: FormData) {
+  const betrag = parseFloat(formData.get("betrag") as string);
+  const zahlungsart = formData.get("zahlungsart") as string;
+
+  await db.zahlung.create({
+    data: { rechnung_id, betrag, zahlungsart },
+  });
+
+  revalidatePath(`/bestellungen/${bestellung_id}/rechnung`);
+  redirect(`/bestellungen/${bestellung_id}/rechnung`);
+}
