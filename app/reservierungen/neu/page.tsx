@@ -1,12 +1,28 @@
 import { db } from "@/lib/db";
 import { reservierungAnlegen } from "../actions";
 
+const FEHLERMELDUNGEN: Record<string, string> = {
+  doppelbelegung:
+    "Dieser Tisch ist im gewählten Zeitfenster (±2 Stunden) bereits belegt. Bitte anderen Tisch oder eine andere Zeit wählen.",
+  ausserhalb_oeffnungszeiten:
+    "Reservierungen sind nur zwischen 12:00 und 22:00 Uhr möglich (letzter Einlass 22:00).",
+  gruppenraum_spandau:
+    "Der Gruppenbereich ist nur im Standort Kreuzberg buchbar. Bitte einen anderen Tisch wählen.",
+};
+
 export default async function ReservierungNeuPage({
   searchParams,
 }: {
-  searchParams: Promise<{ telefon?: string }>;
+  searchParams: Promise<{
+    telefon?: string;
+    error?: string;
+    tisch_id?: string;
+    datum?: string;
+    uhrzeit?: string;
+  }>;
 }) {
-  const { telefon } = await searchParams;
+  const { telefon, error, tisch_id, datum: datumParam, uhrzeit: uhrzeitParam } =
+    await searchParams;
 
   // Gäste: bei Suche gefiltert, sonst alle
   const gaeste = await db.gast.findMany({
@@ -17,6 +33,7 @@ export default async function ReservierungNeuPage({
   const standorte = await db.standort.findMany({
     include: {
       tische: {
+        include: { bereich: true },
         orderBy: { nummer: "asc" },
       },
     },
@@ -30,6 +47,13 @@ export default async function ReservierungNeuPage({
       <h1 className="text-xl font-semibold text-gray-900 mb-6">
         Reservierung anlegen
       </h1>
+
+      {/* Fehlermeldung */}
+      {error && FEHLERMELDUNGEN[error] && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          {FEHLERMELDUNGEN[error]}
+        </div>
+      )}
 
       {/* Gast-Suche */}
       <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
@@ -82,6 +106,7 @@ export default async function ReservierungNeuPage({
             {gaeste.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.vorname} {g.nachname} · {g.telefon}
+                {g.bella_card ? " · Bella-Card" : ""}
               </option>
             ))}
           </select>
@@ -111,15 +136,27 @@ export default async function ReservierungNeuPage({
           </label>
           <select
             name="tisch_id"
+            defaultValue={tisch_id ?? ""}
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
           >
             <option value="">Kein Tisch zugewiesen</option>
             {standorte.map((s) =>
-              s.tische.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {s.name} — Tisch {t.nummer} ({t.kapazitaet} Plätze)
-                </option>
-              ))
+              s.tische.map((t) => {
+                // BV-015: Gruppenbereich nur Kreuzberg — deaktivieren in Spandau
+                const istGruppenraumSpandau =
+                  t.bereich.name === "Gruppenbereich" && s.name === "Spandau";
+                return (
+                  <option
+                    key={t.id}
+                    value={t.id}
+                    disabled={istGruppenraumSpandau}
+                  >
+                    {s.name} — Tisch {t.nummer} ({t.kapazitaet} Plätze,{" "}
+                    {t.bereich.name})
+                    {istGruppenraumSpandau ? " — nur Kreuzberg" : ""}
+                  </option>
+                );
+              })
             )}
           </select>
         </div>
@@ -133,7 +170,7 @@ export default async function ReservierungNeuPage({
               name="datum"
               type="date"
               required
-              defaultValue={heute}
+              defaultValue={datumParam ?? heute}
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
           </div>
@@ -145,9 +182,14 @@ export default async function ReservierungNeuPage({
               name="uhrzeit"
               type="time"
               required
-              defaultValue="19:00"
+              defaultValue={uhrzeitParam ?? "19:00"}
+              min="12:00"
+              max="22:00"
               className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
             />
+            <p className="text-xs text-gray-400 mt-1">
+              Öffnungszeiten: 12:00–22:00 Uhr (letzter Einlass)
+            </p>
           </div>
         </div>
 
