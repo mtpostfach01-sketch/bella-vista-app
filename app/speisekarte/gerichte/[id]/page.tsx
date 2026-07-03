@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
-import { gerichtBearbeiten } from "../../actions";
+import { gerichtBearbeiten, verfuegbarToggle } from "../../actions";
 
 export default async function GerichtBearbeitenPage({
   params,
@@ -30,17 +30,37 @@ export default async function GerichtBearbeitenPage({
   const zugeordneteAllergene = new Set(gericht.allergene.map((a) => a.allergen_id));
 
   const bearbeiten = gerichtBearbeiten.bind(null, gericht.id);
+  // BV-014: Toggle
+  const toggle = verfuegbarToggle.bind(null, gericht.id, !gericht.verfuegbar);
 
   return (
     <div className="max-w-md">
-      <h1 className="text-xl font-semibold text-gray-900 mb-1">
-        {gericht.name}
-      </h1>
-      <p className="text-sm text-gray-500 mb-6">
+      <div className="flex items-center justify-between mb-1">
+        <h1 className="text-xl font-semibold text-gray-900">{gericht.name}</h1>
+        {/* BV-014: Schnell-Toggle */}
+        <form action={toggle}>
+          <button
+            type="submit"
+            className={`text-xs px-3 py-1.5 rounded-md border ${
+              gericht.verfuegbar
+                ? "border-red-200 text-red-600 hover:bg-red-50"
+                : "border-green-200 text-green-700 hover:bg-green-50 bg-green-50"
+            }`}
+          >
+            {gericht.verfuegbar ? "Ausverkauft markieren" : "Wieder verfügbar"}
+          </button>
+        </form>
+      </div>
+      <p className="text-sm text-gray-500 mb-1">
         {gericht.kategorie.speisekarte.standort.name} — {gericht.kategorie.name}
       </p>
+      {!gericht.verfuegbar && (
+        <p className="text-xs text-red-600 mb-4 font-medium">
+          Dieses Gericht ist derzeit als ausverkauft markiert.
+        </p>
+      )}
 
-      <form action={bearbeiten} className="space-y-4">
+      <form action={bearbeiten} className="space-y-4 mt-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Kategorie *
@@ -124,7 +144,7 @@ export default async function GerichtBearbeitenPage({
             className="rounded"
           />
           <label htmlFor="grillgericht" className="text-sm text-gray-700">
-            Grillgericht (nur Kreuzberg)
+            Grillgericht (nur Kreuzberg — BR #8)
           </label>
         </div>
 
@@ -135,7 +155,10 @@ export default async function GerichtBearbeitenPage({
             </label>
             <div className="grid grid-cols-2 gap-1">
               {allergene.map((a) => (
-                <label key={a.id} className="flex items-center gap-1.5 text-sm text-gray-700">
+                <label
+                  key={a.id}
+                  className="flex items-center gap-1.5 text-sm text-gray-700"
+                >
                   <input
                     type="checkbox"
                     name="allergen_ids"
@@ -143,7 +166,9 @@ export default async function GerichtBearbeitenPage({
                     defaultChecked={zugeordneteAllergene.has(a.id)}
                     className="rounded"
                   />
-                  <span className="font-mono text-xs text-gray-500">{a.kuerzel}</span>
+                  <span className="font-mono text-xs text-gray-500">
+                    {a.kuerzel}
+                  </span>
                   {a.name}
                 </label>
               ))}

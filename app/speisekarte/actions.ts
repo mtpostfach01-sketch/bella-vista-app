@@ -36,7 +36,9 @@ export async function gerichtAnlegen(formData: FormData) {
   const preis = parseFloat(formData.get("preis") as string);
   const verfuegbar = formData.get("verfuegbar") === "true";
   const ist_grillgericht = formData.get("ist_grillgericht") === "on";
-  const allergen_ids = formData.getAll("allergen_ids").map((v) => parseInt(v as string, 10));
+  const allergen_ids = formData
+    .getAll("allergen_ids")
+    .map((v) => parseInt(v as string, 10));
 
   const gericht = await db.gericht.create({
     data: {
@@ -65,12 +67,15 @@ export async function gerichtAnlegen(formData: FormData) {
 // ─── Gericht bearbeiten ───────────────────────────────────────
 export async function gerichtBearbeiten(id: number, formData: FormData) {
   const name = (formData.get("name") as string).trim();
-  const beschreibung = (formData.get("beschreibung") as string)?.trim() || null;
+  const beschreibung =
+    (formData.get("beschreibung") as string)?.trim() || null;
   const preis = parseFloat(formData.get("preis") as string);
   const verfuegbar = formData.get("verfuegbar") === "true";
   const ist_grillgericht = formData.get("ist_grillgericht") === "on";
   const kategorie_id = parseInt(formData.get("kategorie_id") as string, 10);
-  const allergen_ids = formData.getAll("allergen_ids").map((v) => parseInt(v as string, 10));
+  const allergen_ids = formData
+    .getAll("allergen_ids")
+    .map((v) => parseInt(v as string, 10));
 
   await db.gericht.update({
     where: { id },
@@ -96,5 +101,18 @@ export async function gerichtBearbeiten(id: number, formData: FormData) {
   }
 
   revalidatePath("/speisekarte");
+  redirect("/speisekarte");
+}
+
+// BV-014: Gericht verfügbar/ausverkauft umschalten ────────────
+export async function verfuegbarToggle(id: number, verfuegbar: boolean) {
+  await db.gericht.update({
+    where: { id },
+    data: { verfuegbar },
+  });
+
+  revalidatePath("/speisekarte");
+  revalidatePath("/bestellungen");
+  revalidatePath(`/speisekarte/gerichte/${id}`);
   redirect("/speisekarte");
 }

@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import Link from "next/link";
+import { verfuegbarToggle } from "./actions";
 
 export default async function SpeisekartePage({
   searchParams,
@@ -78,7 +79,8 @@ export default async function SpeisekartePage({
 
       {!speisekarte ? (
         <p className="text-gray-400 text-sm">
-          Noch keine Speisekarte für {gewaehlterStandort?.name ?? "diesen Standort"}.
+          Noch keine Speisekarte für{" "}
+          {gewaehlterStandort?.name ?? "diesen Standort"}.
           <br />
           Legen Sie eine Kategorie an, um die Karte zu erstellen.
         </p>
@@ -94,48 +96,79 @@ export default async function SpeisekartePage({
                 {kat.name}
               </h2>
               {kat.gerichte.length === 0 ? (
-                <p className="text-gray-400 text-xs pl-1">Keine Gerichte in dieser Kategorie.</p>
+                <p className="text-gray-400 text-xs pl-1">
+                  Keine Gerichte in dieser Kategorie.
+                </p>
               ) : (
                 <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg bg-white">
-                  {kat.gerichte.map((g) => (
-                    <div
-                      key={g.id}
-                      className="flex items-center justify-between px-4 py-3"
-                    >
-                      <div>
-                        <div className="font-medium text-gray-900">
-                          {g.name}
-                          {!g.verfuegbar && (
-                            <span className="ml-2 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded">
-                              Ausverkauft
-                            </span>
-                          )}
-                          {g.ist_grillgericht && (
-                            <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded">
-                              Grill
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {g.preis.toFixed(2)} €
-                          {g.allergene.length > 0 && (
-                            <span className="ml-2 text-xs text-gray-400">
-                              Allergene: {g.allergene.map((a) => a.allergen.kuerzel).join(", ")}
-                            </span>
-                          )}
-                        </div>
-                        {g.beschreibung && (
-                          <div className="text-xs text-gray-400 mt-0.5">{g.beschreibung}</div>
-                        )}
-                      </div>
-                      <Link
-                        href={`/speisekarte/gerichte/${g.id}`}
-                        className="text-sm text-gray-400 hover:text-gray-900"
+                  {kat.gerichte.map((g) => {
+                    // BV-014: Toggle-Action
+                    const toggle = verfuegbarToggle.bind(null, g.id, !g.verfuegbar);
+
+                    return (
+                      <div
+                        key={g.id}
+                        className={`flex items-center justify-between px-4 py-3 ${
+                          !g.verfuegbar ? "opacity-60" : ""
+                        }`}
                       >
-                        Bearbeiten →
-                      </Link>
-                    </div>
-                  ))}
+                        <div>
+                          <div className="font-medium text-gray-900">
+                            {g.name}
+                            {!g.verfuegbar && (
+                              <span className="ml-2 text-xs bg-red-100 text-red-600 px-1.5 py-0.5 rounded">
+                                Ausverkauft
+                              </span>
+                            )}
+                            {g.ist_grillgericht && (
+                              <span className="ml-2 text-xs bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded">
+                                Grill
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {g.preis.toFixed(2)} €
+                            {g.allergene.length > 0 && (
+                              <span className="ml-2 text-xs text-gray-400">
+                                Allergene:{" "}
+                                {g.allergene
+                                  .map((a) => a.allergen.kuerzel)
+                                  .join(", ")}
+                              </span>
+                            )}
+                          </div>
+                          {g.beschreibung && (
+                            <div className="text-xs text-gray-400 mt-0.5">
+                              {g.beschreibung}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {/* BV-014: Ausverkauft-Toggle */}
+                          <form action={toggle}>
+                            <button
+                              type="submit"
+                              className={`text-xs px-2 py-1 rounded border ${
+                                g.verfuegbar
+                                  ? "border-red-200 text-red-600 hover:bg-red-50"
+                                  : "border-green-200 text-green-700 hover:bg-green-50"
+                              }`}
+                            >
+                              {g.verfuegbar
+                                ? "Ausverkauft"
+                                : "Wieder verfügbar"}
+                            </button>
+                          </form>
+                          <Link
+                            href={`/speisekarte/gerichte/${g.id}`}
+                            className="text-sm text-gray-400 hover:text-gray-900"
+                          >
+                            Bearbeiten →
+                          </Link>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
