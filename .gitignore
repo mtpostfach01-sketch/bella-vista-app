@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+
+# Claude Code
+.claude/
+
+# Node
+node_modules/
+.next/
+.env
+.env.local
+
+# Datenbank
+*.db
+*.db-journal
