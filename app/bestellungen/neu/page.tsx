@@ -1,7 +1,22 @@
 import { db } from "@/lib/db";
 import { bestellungAnlegen } from "../actions";
 
-export default async function BestellungNeuPage() {
+const FEHLERMELDUNGEN: Record<string, string> = {
+  kueche_geschlossen:
+    "Die Küche ist geschlossen. Neue Bestellungen sind nur zwischen 12:00 und 22:00 Uhr möglich.",
+  grillgericht_spandau:
+    "Grillgerichte sind im Standort Spandau nicht verfügbar (baulich kein Grill). Bitte Grillgericht aus der Bestellung entfernen.",
+  keine_positionen:
+    "Bitte mindestens ein Gericht mit einer Menge größer als 0 wählen.",
+};
+
+export default async function BestellungNeuPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string; standort_id?: string }>;
+}) {
+  const { error, standort_id: standortParam } = await searchParams;
+
   const standorte = await db.standort.findMany({
     include: {
       tische: {
@@ -36,6 +51,13 @@ export default async function BestellungNeuPage() {
         Bestellung anlegen
       </h1>
 
+      {/* Fehlermeldung */}
+      {error && FEHLERMELDUNGEN[error] && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          {FEHLERMELDUNGEN[error]}
+        </div>
+      )}
+
       <form action={bestellungAnlegen} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -44,6 +66,7 @@ export default async function BestellungNeuPage() {
           <select
             name="standort_id"
             required
+            defaultValue={standortParam ?? ""}
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
           >
             <option value="">Standort wählen …</option>
@@ -119,6 +142,12 @@ export default async function BestellungNeuPage() {
                         <span className="ml-1 text-xs text-gray-400">
                           {g.preis.toFixed(2)} €
                         </span>
+                        {/* BV-012: Grillgericht-Hinweis */}
+                        {g.ist_grillgericht && (
+                          <span className="ml-1 text-xs text-orange-600 font-medium">
+                            🔥 nur Kreuzberg
+                          </span>
+                        )}
                       </span>
                       {/* verstecktes Feld: gericht_id */}
                       <input type="hidden" name="gericht_id" value={g.id} />
@@ -139,6 +168,9 @@ export default async function BestellungNeuPage() {
                   ))
                 )
               )}
+              <p className="text-xs text-gray-400 pt-1">
+                Menge 0 = nicht bestellt · Küche offen bis 22:00 Uhr
+              </p>
             </div>
           )}
         </div>

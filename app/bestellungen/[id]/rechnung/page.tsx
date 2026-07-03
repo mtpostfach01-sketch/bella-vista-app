@@ -21,7 +21,7 @@ export default async function RechnungPage({
       mitarbeiter: true,
       positionen: { include: { gericht: true }, orderBy: { id: "asc" } },
       rechnungen: {
-        include: { zahlungen: true },
+        include: { zahlungen: true, gast: true },
         orderBy: { erstellt_am: "desc" },
       },
     },
@@ -56,7 +56,8 @@ export default async function RechnungPage({
         </Link>
       </div>
       <p className="text-sm text-gray-500 mb-6">
-        {bestellung.standort.name} · Tisch {bestellung.tisch.nummer} · Bestellung #{bestellung.id}
+        {bestellung.standort.name} · Tisch {bestellung.tisch.nummer} ·
+        Bestellung #{bestellung.id}
       </p>
 
       {/* Positionen-Übersicht */}
@@ -74,7 +75,7 @@ export default async function RechnungPage({
             </div>
           ))}
           <div className="flex justify-between px-4 py-3 font-semibold text-gray-900 text-sm bg-gray-50 rounded-b-lg">
-            <span>Gesamtbetrag</span>
+            <span>Zwischensumme</span>
             <span>{summe.toFixed(2)} €</span>
           </div>
         </div>
@@ -83,10 +84,10 @@ export default async function RechnungPage({
       {!existierendeRechnung ? (
         /* Rechnung noch nicht erstellt */
         <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">Rechnung erstellen</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">
+            Rechnung erstellen
+          </h2>
           <form action={erstelleRechnung} className="space-y-4">
-            <input type="hidden" name="gesamt_betrag" value={summe.toFixed(2)} />
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Gast (optional, für Bella-Card-Zuordnung)
@@ -99,44 +100,71 @@ export default async function RechnungPage({
                 {gaeste.map((g) => (
                   <option key={g.id} value={g.id}>
                     {g.vorname} {g.nachname} · {g.telefon}
-                    {g.bella_card ? " · Bella-Card" : ""}
+                    {g.bella_card
+                      ? ` · Bella-Card (15% Rabatt)`
+                      : ` · ${g.besuchsanzahl} Besuche`}
                   </option>
                 ))}
               </select>
             </div>
 
+            {/* BV-010: Hinweis Bella-Card */}
             <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
-              Gesamtbetrag: <strong>{summe.toFixed(2)} €</strong>
-              <br />
-              <span className="text-xs">
-                Kein Rabatt in Phase 1. Bella-Card-Rabatt kommt in Phase 2.
-              </span>
+              <div className="font-medium mb-1">
+                Gesamtbetrag: {summe.toFixed(2)} €
+              </div>
+              <div className="text-xs text-amber-700">
+                Bei Bella-Card-Inhaber: automatisch 15% Rabatt auf den
+                Gesamtbetrag (inkl. Getränke).
+                Bella-Card wird ab dem 10. Besuch aktiviert.
+              </div>
             </div>
 
             <button
               type="submit"
               className="px-4 py-2 bg-gray-900 text-white text-sm rounded-md hover:bg-gray-700"
             >
-              Rechnung abschließen → {summe.toFixed(2)} €
+              Rechnung abschließen
             </button>
           </form>
         </div>
       ) : (
         /* Rechnung bereits erstellt — Zahlungen verwalten */
         <div>
+          {/* BV-010: Bella-Card-Rabatt anzeigen */}
+          {existierendeRechnung.bella_card_rabatt && (
+            <div className="mb-4 flex items-center gap-2 px-4 py-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+              <span className="font-semibold">Bella-Card-Rabatt 15%</span>
+              <span className="text-green-600 text-xs">
+                ({summe.toFixed(2)} € → {existierendeRechnung.gesamt_betrag.toFixed(2)} €)
+              </span>
+              {existierendeRechnung.gast && (
+                <span className="ml-auto text-xs text-green-600">
+                  {existierendeRechnung.gast.vorname}{" "}
+                  {existierendeRechnung.gast.nachname}
+                </span>
+              )}
+            </div>
+          )}
+
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-sm font-semibold text-gray-700">Zahlungen</h2>
-            <span className="text-sm text-gray-500">
-              Offen:{" "}
+            <div className="text-sm text-gray-500">
+              Gesamt:{" "}
+              <strong>{existierendeRechnung.gesamt_betrag.toFixed(2)} €</strong>
+              {" · "}Offen:{" "}
               <strong>
                 {Math.max(
                   0,
                   existierendeRechnung.gesamt_betrag -
-                    existierendeRechnung.zahlungen.reduce((a, z) => a + z.betrag, 0)
+                    existierendeRechnung.zahlungen.reduce(
+                      (a, z) => a + z.betrag,
+                      0
+                    )
                 ).toFixed(2)}{" "}
                 €
               </strong>
-            </span>
+            </div>
           </div>
 
           {existierendeRechnung.zahlungen.length > 0 ? (
@@ -144,7 +172,9 @@ export default async function RechnungPage({
               {existierendeRechnung.zahlungen.map((z) => (
                 <div key={z.id} className="flex justify-between px-4 py-3 text-sm">
                   <span className="text-gray-700">{z.zahlungsart}</span>
-                  <span className="font-medium text-gray-900">{z.betrag.toFixed(2)} €</span>
+                  <span className="font-medium text-gray-900">
+                    {z.betrag.toFixed(2)} €
+                  </span>
                 </div>
               ))}
               <div className="flex justify-between px-4 py-3 text-sm bg-gray-50 rounded-b-lg font-semibold text-gray-900">
@@ -158,7 +188,9 @@ export default async function RechnungPage({
               </div>
             </div>
           ) : (
-            <p className="text-gray-400 text-sm mb-4">Noch keine Zahlungen erfasst.</p>
+            <p className="text-gray-400 text-sm mb-4">
+              Noch keine Zahlungen erfasst.
+            </p>
           )}
 
           {/* Neue Zahlung */}
@@ -183,7 +215,9 @@ function ZahlungForm({
 
   return (
     <div className="border border-gray-200 rounded-lg bg-white p-4">
-      <h3 className="text-sm font-medium text-gray-700 mb-3">Zahlung erfassen</h3>
+      <h3 className="text-sm font-medium text-gray-700 mb-3">
+        Zahlung erfassen
+      </h3>
       <form action={addZahlung} className="space-y-3">
         <div className="grid grid-cols-2 gap-3">
           <div>
