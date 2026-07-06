@@ -17,8 +17,10 @@ export async function reservierungAnlegen(formData: FormData) {
 
   const datum_uhrzeit = new Date(`${datum}T${uhrzeit}:00`);
 
-  // BV-011: Öffnungszeiten — Letzter Einlass 22:00 Uhr
-  if (!istEinlassMoeglich(datum_uhrzeit)) {
+  // BV-011: Standort laden für korrekte Öffnungszeiten
+  const standort = await db.standort.findUnique({ where: { id: standort_id } });
+
+  if (!istEinlassMoeglich(datum_uhrzeit, standort?.name)) {
     redirect(
       `/reservierungen/neu?error=ausserhalb_oeffnungszeiten&datum=${datum}&uhrzeit=${uhrzeit}`
     );
@@ -86,7 +88,8 @@ export async function reservierungBearbeiten(id: number, formData: FormData) {
   const datum_uhrzeit = new Date(`${datum}T${uhrzeit}:00`);
 
   // BV-011: Öffnungszeiten (nur bei aktiven Status prüfen)
-  if (status === "BESTAETIGT" && !istEinlassMoeglich(datum_uhrzeit)) {
+  const standort = await db.standort.findUnique({ where: { id: standort_id } });
+  if (status === "BESTAETIGT" && !istEinlassMoeglich(datum_uhrzeit, standort?.name)) {
     redirect(
       `/reservierungen/${id}?error=ausserhalb_oeffnungszeiten`
     );
