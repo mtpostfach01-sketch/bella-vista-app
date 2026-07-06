@@ -177,6 +177,7 @@ model Bestellung {
 model Bestellposition {
   id            Int        @id @default(autoincrement())
   menge         Int
+  einzelpreis   Float      // Preis zum Zeitpunkt der Bestellung (historisch korrekt)
   notiz         String?
   status        String     @default("OFFEN") // OFFEN | IN_ZUBEREITUNG | FERTIG
   bestellung_id Int

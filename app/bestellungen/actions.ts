@@ -15,8 +15,11 @@ export async function bestellungAnlegen(formData: FormData) {
   const mitarbeiter_id = parseInt(formData.get("mitarbeiter_id") as string, 10);
   const standort_id = parseInt(formData.get("standort_id") as string, 10);
 
-  // BV-011: Küchenschluss prüfen
-  if (!istKuecheOffen(new Date())) {
+  // Standort laden (für BR #9 + #12)
+  const standort = await db.standort.findUnique({ where: { id: standort_id } });
+
+  // BV-011: Küchenschluss standortspezifisch prüfen
+  if (!istKuecheOffen(new Date(), standort?.name)) {
     redirect("/bestellungen/neu?error=kueche_geschlossen");
   }
 
@@ -38,16 +41,16 @@ export async function bestellungAnlegen(formData: FormData) {
     redirect("/bestellungen/neu?error=keine_positionen");
   }
 
+  // Alle betroffenen Gerichte laden (für Einzelpreise + Grillgericht-Check)
+  const gerichte = await db.gericht.findMany({
+    where: { id: { in: positionen.map((p) => p.gericht_id) } },
+  });
+  const gerichtMap = new Map(gerichte.map((g) => [g.id, g]));
+
   // BV-012: Grillgerichte in Spandau sperren
-  const standort = await db.standort.findUnique({ where: { id: standort_id } });
   if (standort?.name === "Spandau") {
-    const grillGerichte = await db.gericht.findMany({
-      where: {
-        id: { in: positionen.map((p) => p.gericht_id) },
-        ist_grillgericht: true,
-      },
-    });
-    if (grillGerichte.length > 0) {
+    const hatGrillgericht = positionen.some((p) => gerichtMap.get(p.gericht_id)?.ist_grillgericht);
+    if (hatGrillgericht) {
       redirect(
         `/bestellungen/neu?error=grillgericht_spandau&standort_id=${standort_id}`
       );
@@ -65,6 +68,7 @@ export async function bestellungAnlegen(formData: FormData) {
         create: positionen.map((p) => ({
           gericht_id: p.gericht_id,
           menge: p.menge,
+          einzelpreis: gerichtMap.get(p.gericht_id)?.preis ?? 0,
           notiz: p.notiz,
           status: "OFFEN",
         })),
@@ -89,8 +93,14 @@ export async function positionHinzufuegen(bestellung_id: number, formData: FormD
   const menge = parseInt(formData.get("menge") as string, 10);
   const notiz = (formData.get("notiz") as string)?.trim() || null;
 
-  // BV-011: Küchenschluss prüfen
-  if (!istKuecheOffen(new Date())) {
+  // Bestellung + Standort + Gericht vorab laden
+  const [bestellung, gericht] = await Promise.all([
+    db.bestellung.findUnique({ where: { id: bestellung_id }, include: { standort: true } }),
+    db.gericht.findUnique({ where: { id: gericht_id }, include: { kategorie: true } }),
+  ]);
+
+  // BV-011: Küchenschluss standortspezifisch prüfen
+  if (!istKuecheOffen(new Date(), bestellung?.standort.name)) {
     redirect(`/bestellungen/${bestellung_id}?error=kueche_geschlossen`);
   }
 
@@ -100,33 +110,26 @@ export async function positionHinzufuegen(bestellung_id: number, formData: FormD
   });
 
   if (kuechenauftrag?.status === "IN_ARBEIT") {
-    // Nur Getränke erlaubt
-    const gericht = await db.gericht.findUnique({
-      where: { id: gericht_id },
-      include: { kategorie: true },
-    });
-    const istGetraenk = gericht?.kategorie.name
-      .toLowerCase()
-      .includes("getränk");
+    const istGetraenk = gericht?.kategorie.name.toLowerCase().includes("getränk");
     if (!istGetraenk) {
-      redirect(
-        `/bestellungen/${bestellung_id}?error=kueche_in_arbeit`
-      );
+      redirect(`/bestellungen/${bestellung_id}?error=kueche_in_arbeit`);
     }
   }
 
   // BV-012: Grillgericht in Spandau sperren
-  const bestellung = await db.bestellung.findUnique({
-    where: { id: bestellung_id },
-    include: { standort: true },
-  });
-  const gericht = await db.gericht.findUnique({ where: { id: gericht_id } });
   if (gericht?.ist_grillgericht && bestellung?.standort.name === "Spandau") {
     redirect(`/bestellungen/${bestellung_id}?error=grillgericht_spandau`);
   }
 
   await db.bestellposition.create({
-    data: { bestellung_id, gericht_id, menge, notiz, status: "OFFEN" },
+    data: {
+      bestellung_id,
+      gericht_id,
+      menge,
+      einzelpreis: gericht?.preis ?? 0,
+      notiz,
+      status: "OFFEN",
+    },
   });
 
   revalidatePath(`/bestellungen/${bestellung_id}`);
@@ -168,15 +171,15 @@ export async function rechnungErstellen(bestellung_id: number, formData: FormDat
   const gast_id_raw = formData.get("gast_id") as string;
   const gast_id = gast_id_raw ? parseInt(gast_id_raw, 10) : null;
 
-  // Summe serverseitig berechnen (sicher)
+  // Summe aus gespeichertem Einzelpreis berechnen (historisch korrekt, BR #5)
   const bestellung = await db.bestellung.findUnique({
     where: { id: bestellung_id },
-    include: { positionen: { include: { gericht: true } } },
+    include: { positionen: true },
   });
   if (!bestellung) throw new Error("Bestellung nicht gefunden");
 
   const summe = bestellung.positionen.reduce(
-    (acc, p) => acc + p.menge * p.gericht.preis,
+    (acc, p) => acc + p.menge * p.einzelpreis,
     0
   );
 

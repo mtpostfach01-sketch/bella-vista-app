@@ -105,7 +105,7 @@ Anmeldung: Startseite → Mitarbeiter auswählen (kein Passwort, interne App).
 | #3–5 | Bella-Card ab 10 Besuchen, 15% Rabatt |
 | #7 | Gruppenbereich nur Kreuzberg |
 | #8 | Grillgerichte nur Kreuzberg |
-| #9–10 | Öffnungszeiten 12–23 Uhr, Küchenschluss 22 Uhr |
+| #9–10 | Öffnungszeiten standortspezifisch (KB: Di–So 12–15+18–23 Uhr / SP: Mi–So 17–22 Uhr) |
 | #11–12 | Bestelländerung nur vor Küchenstart, Getränke jederzeit |
 | #13 | Ausverkauft-Toggle sofort sichtbar |
 | #14–15 | No-Show nach 20 Min, Tisch → FREI |
