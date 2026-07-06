@@ -30,6 +30,7 @@ model Gast {
   telefon       String  @unique
   email         String?
   notiz         String?
+  lieblingstisch String? // CRM: bevorzugter Tisch (Freitext, z. B. "Tisch 4 Terrasse")
   bella_card    Boolean @default(false)
   besuchsanzahl Int     @default(0)
 
