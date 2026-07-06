@@ -99,8 +99,11 @@ export async function positionHinzufuegen(bestellung_id: number, formData: FormD
     db.gericht.findUnique({ where: { id: gericht_id }, include: { kategorie: true } }),
   ]);
 
+  if (!bestellung) redirect(`/bestellungen?error=nicht_gefunden`);
+  if (!gericht) redirect(`/bestellungen/${bestellung_id}?error=gericht_nicht_gefunden`);
+
   // BV-011: Küchenschluss standortspezifisch prüfen
-  if (!istKuecheOffen(new Date(), bestellung?.standort.name)) {
+  if (!istKuecheOffen(new Date(), bestellung.standort.name)) {
     redirect(`/bestellungen/${bestellung_id}?error=kueche_geschlossen`);
   }
 
@@ -110,14 +113,14 @@ export async function positionHinzufuegen(bestellung_id: number, formData: FormD
   });
 
   if (kuechenauftrag?.status === "IN_ARBEIT") {
-    const istGetraenk = gericht?.kategorie.name.toLowerCase().includes("getränk");
+    const istGetraenk = gericht.kategorie.name.toLowerCase().includes("getränk");
     if (!istGetraenk) {
       redirect(`/bestellungen/${bestellung_id}?error=kueche_in_arbeit`);
     }
   }
 
   // BV-012: Grillgericht in Spandau sperren
-  if (gericht?.ist_grillgericht && bestellung?.standort.name === "Spandau") {
+  if (gericht.ist_grillgericht && bestellung.standort.name === "Spandau") {
     redirect(`/bestellungen/${bestellung_id}?error=grillgericht_spandau`);
   }
 
@@ -126,7 +129,7 @@ export async function positionHinzufuegen(bestellung_id: number, formData: FormD
       bestellung_id,
       gericht_id,
       menge,
-      einzelpreis: gericht?.preis ?? 0,
+      einzelpreis: gericht.preis,
       notiz,
       status: "OFFEN",
     },
@@ -240,5 +243,5 @@ export async function zahlungHinzufuegen(
   });
 
   revalidatePath(`/bestellungen/${bestellung_id}/rechnung`);
-  redirect(`/bestellungen/${bestellung_id}/rechnung`);
+  redirect(`/bestellungen/${bestellung_id}/rechnung?rechnung_id=${rechnung_id}`);
 }
