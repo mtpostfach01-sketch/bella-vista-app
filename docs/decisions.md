@@ -70,3 +70,30 @@ _Append-only Log. Einmal getroffen — nie stillschweigend geändert. Neue Entsc
 - Auth-Strategie (z. B. next-auth) noch offen — vor BV-016 (Rollenbasierter Zugriff) klären
 
 **Konsequenz:** `prisma/schema.prisma` ist die Wahrheitsquelle für das Datenmodell. Business Rules laufen via Server Actions server-seitig. Offline-Verhalten (SPEC.md §6/2) ist v2-Thema — v1 setzt WLAN-Verfügbarkeit voraus.
+
+---
+
+## ADR-006: Bella-Card als Felder auf Gast statt eigene Entität
+
+**Status:** Akzeptiert  
+**Datum:** 2026-07-03
+
+### Kontext
+
+spec.md (§2, Entität #16) beschreibt die Bella-Card als eigenständige Entität mit Attributen (Kartennummer, Ausstellungsdatum, Status). Eine eigene Tabelle würde eine 1:1-Beziehung zu Gast erzeugen.
+
+### Entscheidung
+
+Die Bella-Card wird nicht als separate Entität modelliert, sondern als zwei Felder direkt auf dem Gast-Datensatz:
+- `bella_card Boolean` — ob Karte aktiv
+- `besuchsanzahl Int` — Besuchszähler für automatische Aktivierung
+
+### Begründung
+
+Die einzigen Operationen auf der Bella-Card sind: Prüfen ob aktiv (bei Rechnungsstellung) und automatisches Aktivieren bei Besuch #10. Eine eigene Entität würde für diese zwei einfachen Felder unnötige JOIN-Komplexität erzeugen. Kartennummer und Ausstellungsdatum werden im internen System nicht benötigt (keine Druckfunktion geplant, TSE-Kassenkopplung in v2 zurückgestellt per ADR-004).
+
+### Konsequenzen
+
+- Einfachere Abfragen (kein JOIN)
+- Bella-Card-Status ist direkt auf dem Gast-Objekt verfügbar
+- Falls v2 Druckkarten erfordert: Migration zu eigener Entität nötig (ADR-004 prüfen)
