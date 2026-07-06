@@ -39,7 +39,7 @@ export default async function BestellungenPage() {
         <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg bg-white">
           {bestellungen.map((b) => {
             const summe = b.positionen.reduce(
-              (acc, p) => acc + p.menge * p.gericht.preis,
+              (acc, p) => acc + p.menge * p.einzelpreis,
               0
             );
             const zeitStr = new Date(b.erstellt_am).toLocaleString("de-DE", {

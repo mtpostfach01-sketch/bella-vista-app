@@ -30,7 +30,7 @@ export default async function RechnungPage({
   if (!bestellung) notFound();
 
   const summe = bestellung.positionen.reduce(
-    (acc, p) => acc + p.menge * p.gericht.preis,
+    (acc, p) => acc + p.menge * p.einzelpreis,
     0
   );
 
@@ -71,7 +71,7 @@ export default async function RechnungPage({
                 {p.menge}× {p.gericht.name}
               </span>
               <span className="text-gray-900 font-medium">
-                {(p.menge * p.gericht.preis).toFixed(2)} €
+                {(p.menge * p.einzelpreis).toFixed(2)} €
               </span>
             </div>
           ))}

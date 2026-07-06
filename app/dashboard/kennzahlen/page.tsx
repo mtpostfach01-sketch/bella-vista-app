@@ -45,7 +45,7 @@ export default async function KennzahlenPage() {
       gerichtMap.set(pos.gericht_id, {
         name: pos.gericht.name,
         menge: pos.menge,
-        preis: pos.gericht.preis,
+        preis: pos.einzelpreis,
       });
     }
   }

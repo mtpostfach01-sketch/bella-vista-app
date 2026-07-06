@@ -48,7 +48,7 @@ export default async function BestellungDetailPage({
   if (!bestellung) notFound();
 
   const summe = bestellung.positionen.reduce(
-    (acc, p) => acc + p.menge * p.gericht.preis,
+    (acc, p) => acc + p.menge * p.einzelpreis,
     0
   );
 
@@ -191,7 +191,7 @@ export default async function BestellungDetailPage({
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="text-sm text-gray-500">
-                      {(p.menge * p.gericht.preis).toFixed(2)} €
+                      {(p.menge * p.einzelpreis).toFixed(2)} €
                     </div>
                     {/* BV-013: Entfernen-Button nur wenn KA OFFEN */}
                     {kaOffen &&
