@@ -117,7 +117,7 @@ export default async function RootLayout({
         </nav>
 
         {/* Unten Platz für die fixierte mobile Tab-Leiste lassen */}
-        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 pb-24 md:pb-8">
+        <main className="flex-1 px-4 pt-6 pb-24 sm:px-6 sm:pt-7 md:pb-8">
           {children}
         </main>
 
