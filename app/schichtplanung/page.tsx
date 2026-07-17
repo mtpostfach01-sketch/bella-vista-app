@@ -26,10 +26,17 @@ export default async function SchichtplanungPage({
         aktiver.rolle === "CHEF"
           ? undefined
           : { standort_id: aktiver.standort_id! },
-      include: { mitarbeiter: true, standort: true },
+      include: { mitarbeiter: { include: { standort: true } }, standort: true },
       orderBy: { datum: "desc" },
     }),
   ]);
+
+  // Wer arbeitet heute wo — mit Hervorhebung, wenn abweichend vom Stammstandort
+  const heute = new Date();
+  heute.setHours(0, 0, 0, 0);
+  const schichtenHeute = schichten.filter(
+    (s) => new Date(s.datum).getTime() === heute.getTime()
+  );
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -40,6 +47,41 @@ export default async function SchichtplanungPage({
           Bitte alle Pflichtfelder ausfüllen.
         </div>
       )}
+
+      {/* Wer arbeitet heute wo — Kontrast zum Stammstandort macht Einspringen sichtbar */}
+      <section>
+        <h2 className="text-sm font-semibold text-gray-700 mb-3">
+          Heute im Einsatz
+        </h2>
+        {schichtenHeute.length === 0 ? (
+          <p className="text-sm text-gray-400">Für heute ist niemand eingetragen.</p>
+        ) : (
+          <div className="border border-gray-200 rounded-lg bg-white divide-y divide-gray-100">
+            {schichtenHeute.map((s) => {
+              const stammstandort = s.mitarbeiter.standort?.name;
+              const springtEin = stammstandort && stammstandort !== s.standort.name;
+              return (
+                <div key={s.id} className="flex items-center justify-between px-4 py-3">
+                  <div className="font-medium text-gray-900">
+                    {s.mitarbeiter.vorname} {s.mitarbeiter.nachname}
+                  </div>
+                  <div className="text-sm">
+                    {springtEin ? (
+                      <span className="text-amber-700">
+                        sonst {stammstandort} <span className="text-gray-400">→</span>{" "}
+                        <span className="font-medium">heute {s.standort.name}</span>
+                      </span>
+                    ) : (
+                      <span className="text-gray-600">{s.standort.name}</span>
+                    )}
+                    <span className="text-gray-400"> · {s.von}–{s.bis}</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
 
       <section className="border border-gray-200 rounded-lg bg-white p-5">
         <h2 className="text-sm font-semibold text-gray-700 mb-4">
@@ -142,6 +184,8 @@ export default async function SchichtplanungPage({
           <div className="border border-gray-200 rounded-lg bg-white divide-y divide-gray-100">
             {schichten.map((s) => {
               const entfernenAction = schichtEntfernen.bind(null, s.id);
+              const stammstandort = s.mitarbeiter.standort?.name;
+              const springtEin = stammstandort && stammstandort !== s.standort.name;
               return (
                 <div
                   key={s.id}
@@ -150,9 +194,9 @@ export default async function SchichtplanungPage({
                   <div>
                     <div className="font-medium text-gray-900">
                       {s.mitarbeiter.vorname} {s.mitarbeiter.nachname}
-                      {s.einspring_flag && (
+                      {springtEin && (
                         <span className="ml-2 text-xs px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
-                          Einspringen
+                          Einspringen: sonst {stammstandort}
                         </span>
                       )}
                     </div>

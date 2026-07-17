@@ -146,3 +146,32 @@ letzte Wort haben."
 **Konsequenz:** Neues Modell `Trinkgeldverteilung` speichert nur das
 bestätigte Ergebnis, nicht den Berechnungsweg — der Vorschlag wird bei jedem
 Aufruf neu aus den Rohdaten berechnet (kein gespeicherter Zwischenstand).
+
+---
+
+## ADR-009 — Konsistente Standort-Gruppierung in Listenansichten
+
+**Status:** Entschieden (Juli 2026)
+**Kontext:** ADR-001 legt fest, dass Standort der primäre Anker fast aller
+Daten ist. In der Praxis zeigten `/reservierungen`, `/bestellungen` und
+`/mitarbeiter` aber eine einzige gemischte Liste beider Standorte (nur
+`/tische` war schon nach Standort gruppiert) — genau der Überblicksverlust,
+den Marco im Interview beschreibt („weiß manchmal selbst nicht mehr genau,
+wer gerade wo ist").
+
+**Entscheidung:** Alle standortgebundenen Listenansichten zeigen durchgängig
+getrennte „Kreuzberg" / „Spandau"-Abschnitte (Muster von `/tische`
+übernommen), statt einer chronologisch gemischten Liste. Datensätze, die
+laut ADR-003 tatsächlich standortübergreifend sind (Gast, sowie Mitarbeiter
+mit `standort_id = null`, i. d. R. der Chef), werden bewusst **nicht** in
+eine Standort-Gruppe gezwungen — Mitarbeiter bekommt dafür eine eigene
+Sektion „Alle Standorte".
+
+**Begründung:** Setzt ADR-001 konsequent in der UI um, statt es nur beim
+Datenmodell zu belassen. Vermeidet, dass Chef/Manager Kreuzberg- und
+Spandau-Einträge manuell im Kopf sortieren müssen.
+
+**Konsequenz:** Neue standortgebundene Listenseiten sollten künftig
+standardmäßig nach diesem Muster (`db.standort.findMany({ include: {...} })`
++ Gruppen-Header) aufgebaut werden, nicht als ungruppierter `findMany` auf
+der Kind-Entität.

@@ -2,15 +2,19 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 
 export default async function BestellungenPage() {
-  const bestellungen = await db.bestellung.findMany({
+  const standorte = await db.standort.findMany({
     include: {
-      tisch: true,
-      standort: true,
-      mitarbeiter: true,
-      positionen: { include: { gericht: true } },
-      kuechenauftrag: true,
+      bestellungen: {
+        include: {
+          tisch: true,
+          mitarbeiter: true,
+          positionen: { include: { gericht: true } },
+          kuechenauftrag: true,
+        },
+        orderBy: { erstellt_am: "desc" },
+      },
     },
-    orderBy: { erstellt_am: "desc" },
+    orderBy: { name: "asc" },
   });
 
   const statusBadge: Record<string, string> = {
@@ -20,6 +24,13 @@ export default async function BestellungenPage() {
     BEZAHLT: "bg-gray-100 text-gray-500",
     STORNIERT: "bg-red-100 text-red-600",
   };
+
+  const bestellartBadge: Record<string, string> = {
+    ABHOLUNG: "bg-purple-100 text-purple-700",
+    CATERING: "bg-blue-100 text-blue-700",
+  };
+
+  const gesamtAnzahl = standorte.reduce((a, s) => a + s.bestellungen.length, 0);
 
   return (
     <div className="max-w-2xl">
@@ -33,58 +44,71 @@ export default async function BestellungenPage() {
         </Link>
       </div>
 
-      {bestellungen.length === 0 ? (
+      {gesamtAnzahl === 0 ? (
         <p className="text-gray-400 text-sm">Noch keine Bestellungen vorhanden.</p>
       ) : (
-        <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg bg-white">
-          {bestellungen.map((b) => {
-            const summe = b.positionen.reduce(
-              (acc, p) => acc + p.menge * p.einzelpreis,
-              0
-            );
-            const zeitStr = new Date(b.erstellt_am).toLocaleString("de-DE", {
-              day: "2-digit",
-              month: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            });
+        // Nach Standort gruppiert — jede Bestellung gehört immer zu genau
+        // einem Standort (ADR-001), daher kein "standortübergreifend"-Fall
+        standorte.map((standort) => (
+          <div key={standort.id} className="mb-8">
+            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+              {standort.name} ({standort.bestellungen.length})
+            </h2>
+            {standort.bestellungen.length === 0 ? (
+              <p className="text-gray-400 text-sm">Keine Bestellungen.</p>
+            ) : (
+              <div className="divide-y divide-gray-100 border border-gray-200 rounded-lg bg-white">
+                {standort.bestellungen.map((b) => {
+                  const summe = b.positionen.reduce(
+                    (acc, p) => acc + p.menge * p.einzelpreis,
+                    0
+                  );
+                  const zeitStr = new Date(b.erstellt_am).toLocaleString("de-DE", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  });
 
-            return (
-              <div key={b.id} className="flex items-center justify-between px-4 py-3">
-                <div>
-                  <div className="font-medium text-gray-900">
-                    {b.standort.name} ·{" "}
-                    {b.tisch ? `Tisch ${b.tisch.nummer}` : ""}
-                    {/* BV-107: Abholung-Badge */}
-                    {(b as { bestellart?: string }).bestellart === "ABHOLUNG" && (
-                      <span className="ml-1 text-xs bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
-                        Abholung
-                      </span>
-                    )}
-                    <span
-                      className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
-                        statusBadge[b.status] ?? "bg-gray-100 text-gray-500"
-                      }`}
-                    >
-                      {b.status}
-                    </span>
-                  </div>
-                  <div className="text-sm text-gray-500">
-                    {b.positionen.length} Position(en) · {summe.toFixed(2)} € ·{" "}
-                    {b.mitarbeiter.vorname} {b.mitarbeiter.nachname}
-                  </div>
-                  <div className="text-xs text-gray-400">{zeitStr}</div>
-                </div>
-                <Link
-                  href={`/bestellungen/${b.id}`}
-                  className="text-sm text-gray-400 hover:text-gray-900"
-                >
-                  Details →
-                </Link>
+                  return (
+                    <div key={b.id} className="flex items-center justify-between px-4 py-3">
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {b.tisch ? `Tisch ${b.tisch.nummer}` : "Kein Tisch"}
+                          {bestellartBadge[b.bestellart] && (
+                            <span
+                              className={`ml-2 text-xs px-1.5 py-0.5 rounded ${bestellartBadge[b.bestellart]}`}
+                            >
+                              {b.bestellart === "ABHOLUNG" ? "Abholung" : "Catering"}
+                            </span>
+                          )}
+                          <span
+                            className={`ml-2 text-xs px-1.5 py-0.5 rounded ${
+                              statusBadge[b.status] ?? "bg-gray-100 text-gray-500"
+                            }`}
+                          >
+                            {b.status}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {b.positionen.length} Position(en) · {summe.toFixed(2)} € ·{" "}
+                          {b.mitarbeiter.vorname} {b.mitarbeiter.nachname}
+                        </div>
+                        <div className="text-xs text-gray-400">{zeitStr}</div>
+                      </div>
+                      <Link
+                        href={`/bestellungen/${b.id}`}
+                        className="text-sm text-gray-400 hover:text-gray-900"
+                      >
+                        Details →
+                      </Link>
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })}
-        </div>
+            )}
+          </div>
+        ))
       )}
     </div>
   );
