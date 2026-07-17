@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f9f9;
-  --foreground: #0f2e2c;
+  --background: #faf6ee;
+  --foreground: #2b0e13;
 }
 
 @theme inline {
@@ -13,32 +13,42 @@
   --font-heading: var(--font-fraunces);
 }
 
-/* ─── Amalfi-Palette: Tiefes Teal (Primär) + Senfgelb (Akzent) ──── */
+/* ─── Bordeaux-Palette: Tiefes Weinrot (Primär) + Altgold (Akzent) ── */
 /* Ersetzt die neutrale Standard-Tailwind-Grauskala durch warme,
-   blaugrün-getönte Neutraltöne; gray-900 trägt die Markenfarbe
+   weinrot-getönte Neutraltöne; gray-900 trägt die Markenfarbe
    (Buttons, Überschriften, Fokus-Ringe) — betrifft die ganze App,
    ohne dass einzelne Seiten angepasst werden müssen. */
 @theme {
-  --color-gray-50: #f7f9f9;
-  --color-gray-100: #eaf1f0;
-  --color-gray-200: #d8e2e0;
-  --color-gray-300: #b7c9c6;
-  --color-gray-400: #8aa19e;
-  --color-gray-500: #5f7d7a;
-  --color-gray-600: #3f6360;
-  --color-gray-700: #164e49;
-  --color-gray-800: #0f3c38;
-  --color-gray-900: #0f5c5c;
+  --color-white: #fffdf8;
 
-  /* Senfgelb-Akzent statt Standard-Amber (Hinweise, Bella-Card, TSE, Warnungen) */
-  --color-amber-50: #fdf8ec;
-  --color-amber-100: #f8ecc9;
-  --color-amber-200: #f0dda0;
-  --color-amber-400: #e0b845;
-  --color-amber-500: #d4a017;
-  --color-amber-600: #b8890f;
-  --color-amber-700: #96700c;
-  --color-amber-800: #7a5a0a;
+  --color-gray-50: #faf6ee;
+  --color-gray-100: #f2e9d8;
+  --color-gray-200: #e6dcc8;
+  --color-gray-300: #d3c3a4;
+  --color-gray-400: #b6a488;
+  --color-gray-500: #8a6f5c;
+  --color-gray-600: #74392f;
+  --color-gray-700: #551722;
+  --color-gray-800: #451420;
+  --color-gray-900: #6b1f2a;
+
+  /* Altgold-Akzent statt Standard-Amber/Senfgelb (Hinweise, Bella-Card, TSE, Warnungen) */
+  --color-amber-50: #faf3e2;
+  --color-amber-100: #f0e0bc;
+  --color-amber-200: #e3cb8f;
+  --color-amber-400: #c1a052;
+  --color-amber-500: #a9812f;
+  --color-amber-600: #8f6a24;
+  --color-amber-700: #74551d;
+  --color-amber-800: #5c4317;
+
+  /* Nav-Leiste nutzt bg-gradient-to-r from-teal-900 to-teal-800 —
+     hier auf dieselbe Bordeaux-Tonalität umgestellt, damit kein
+     einzelnes Layout-File angefasst werden muss. */
+  --color-teal-900: #6b1f2a;
+  --color-teal-800: #451420;
+  --color-teal-100: #e8d9b8;
+  --color-teal-950: #2b0e13;
 
   /* Weichere, einladendere Ecken statt kantiger Formular-Optik */
   --radius-md: 0.6rem;
@@ -72,29 +82,29 @@ h1 {
 
 /* Karten (border-gray-200 rounded-lg bg-white — Listen, Formulare, Kacheln) */
 .border-gray-200.rounded-lg {
-  box-shadow: 0 1px 2px rgba(15, 60, 56, 0.05), 0 1px 1px rgba(15, 60, 56, 0.03);
+  box-shadow: 0 1px 2px rgba(107, 31, 42, 0.06), 0 1px 1px rgba(107, 31, 42, 0.04);
   transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
 }
 
 /* Klickbare Kacheln (z. B. Startseite) heben sich beim Hover sanft an */
 a.border-gray-200.rounded-lg:hover {
-  box-shadow: 0 8px 20px rgba(15, 60, 56, 0.1), 0 2px 6px rgba(15, 60, 56, 0.06);
+  box-shadow: 0 8px 20px rgba(107, 31, 42, 0.12), 0 2px 6px rgba(107, 31, 42, 0.07);
   transform: translateY(-2px);
   border-color: var(--color-gray-300);
 }
 
 /* Primäre Buttons (bg-gray-900 ... rounded-md) — Schatten + Lift statt reinem Farbwechsel */
 .bg-gray-900.rounded-md {
-  box-shadow: 0 1px 2px rgba(15, 60, 56, 0.15);
+  box-shadow: 0 1px 2px rgba(107, 31, 42, 0.18);
   transition: box-shadow 0.15s ease, transform 0.1s ease, background-color 0.15s ease;
 }
 .bg-gray-900.rounded-md:hover {
-  box-shadow: 0 4px 12px rgba(15, 60, 56, 0.22);
+  box-shadow: 0 4px 12px rgba(107, 31, 42, 0.26);
   transform: translateY(-1px);
 }
 .bg-gray-900.rounded-md:active {
   transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(15, 60, 56, 0.15);
+  box-shadow: 0 1px 2px rgba(107, 31, 42, 0.18);
 }
 
 /* Sanftere Farbübergänge überall, wo bereits hover:-Klassen genutzt werden */
