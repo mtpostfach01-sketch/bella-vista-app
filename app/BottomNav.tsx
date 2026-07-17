@@ -36,22 +36,22 @@ export function BottomNav({ tabs }: { tabs: Tab[] }) {
       {mehrOffen && (
         <>
           <div
-            className="fixed inset-0 z-30"
+            className="fixed inset-0 z-30 bg-black/20"
             onClick={() => setMehrOffen(false)}
           />
-          <div className="fixed bottom-16 right-2 z-40 bg-white border border-gray-200 rounded-lg shadow-xl py-1.5 min-w-[10rem]">
+          <div className="fixed bottom-16 left-0 right-0 z-40 bg-white rounded-t-2xl shadow-2xl p-4 pb-6 grid grid-cols-3 gap-2">
             {imDropdown.map((tab) => {
               const aktiv = istAktiv(tab.href);
               return (
                 <Link
                   key={tab.href}
                   href={tab.href}
-                  className={`flex items-center gap-2.5 px-4 py-2.5 text-sm ${
-                    aktiv ? "text-gray-900 font-medium bg-gray-50" : "text-gray-700 hover:bg-gray-50"
+                  className={`flex flex-col items-center justify-center gap-1 py-3 rounded-lg ${
+                    aktiv ? "bg-gray-100 text-gray-900 font-medium" : "text-gray-700 hover:bg-gray-50"
                   }`}
                 >
-                  <span className="text-base">{tab.icon}</span>
-                  {tab.label}
+                  <span className="text-2xl">{tab.icon}</span>
+                  <span className="text-xs">{tab.label}</span>
                 </Link>
               );
             })}
