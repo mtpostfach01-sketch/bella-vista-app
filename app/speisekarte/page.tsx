@@ -171,8 +171,8 @@ export default async function SpeisekartePage({
                               }`}
                             >
                               {g.verfuegbar
-                                ? "Ausverkauft"
-                                : "Wieder verfügbar"}
+                                ? "Ausverkauft markieren"
+                                : "Wieder verfügbar markieren"}
                             </button>
                           </form>
                           <Link

@@ -47,7 +47,7 @@ export default async function GerichtBearbeitenPage({
                 : "border-green-200 text-green-700 hover:bg-green-50 bg-green-50"
             }`}
           >
-            {gericht.verfuegbar ? "Ausverkauft markieren" : "Wieder verfügbar"}
+            {gericht.verfuegbar ? "Ausverkauft markieren" : "Wieder verfügbar markieren"}
           </button>
         </form>
       </div>
