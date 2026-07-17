@@ -1,10 +1,13 @@
 /**
- * BV-016: Rollenbasierter Zugriff (Middleware)
+ * BV-016: Rollenbasierter Zugriff (Proxy, ehem. Middleware — Next.js 16)
  *
  * Rollen:
  *   CHEF     → Zugriff auf alles
  *   MANAGER  → kein Zugriff auf /mitarbeiter/*
  *   BEDIENUNG → nur /bestellungen/*, /reservierungen/*, /gaeste/*, /tische/*
+ *              (alle neuen Phase-3-Bereiche wie /catering, /schichtplanung,
+ *              /trinkgeld, /erinnerungen, /speisekarte/* sind für BEDIENUNG
+ *              damit ebenfalls automatisch gesperrt — nicht in der Allowlist)
  *
  * Ohne Session: alle Seiten erreichbar (für initiale Einrichtung / Tests).
  * Mit Session: Rolle wird aus Cookie gelesen (kein DB-Aufruf in Edge).
@@ -13,7 +16,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const rolle = request.cookies.get("mitarbeiter_rolle")?.value;
   const { pathname } = request.nextUrl;
 

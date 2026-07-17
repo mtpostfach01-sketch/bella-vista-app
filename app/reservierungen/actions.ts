@@ -14,6 +14,10 @@ export async function reservierungAnlegen(formData: FormData) {
   const uhrzeit = formData.get("uhrzeit") as string;
   const personenanzahl = parseInt(formData.get("personenanzahl") as string, 10);
   const notiz = (formData.get("notiz") as string)?.trim() || null;
+  const gruppenmenue_id_raw = formData.get("gruppenmenue_id") as string;
+  const gruppenmenue_id = gruppenmenue_id_raw ? parseInt(gruppenmenue_id_raw, 10) : null;
+  const anzahlung_betrag_raw = formData.get("anzahlung_betrag") as string;
+  const anzahlung_betrag = anzahlung_betrag_raw ? parseFloat(anzahlung_betrag_raw) : null;
 
   const datum_uhrzeit = new Date(`${datum}T${uhrzeit}:00`);
 
@@ -59,7 +63,7 @@ export async function reservierungAnlegen(formData: FormData) {
     }
   }
 
-  await db.reservierung.create({
+  const reservierung = await db.reservierung.create({
     data: {
       gast_id,
       standort_id,
@@ -68,7 +72,17 @@ export async function reservierungAnlegen(formData: FormData) {
       personenanzahl,
       notiz,
       status: "BESTAETIGT",
+      gruppenmenue_id,
+      anzahlung_betrag,
     },
+  });
+
+  // BR #22: Erinnerung am Vortag, 18:00 Uhr (BV-101, simuliert — kein echtes SMS-Gateway)
+  const versandzeitpunkt = new Date(datum_uhrzeit);
+  versandzeitpunkt.setDate(versandzeitpunkt.getDate() - 1);
+  versandzeitpunkt.setHours(18, 0, 0, 0);
+  await db.erinnerung.create({
+    data: { reservierung_id: reservierung.id, versandzeitpunkt },
   });
 
   revalidatePath("/reservierungen");

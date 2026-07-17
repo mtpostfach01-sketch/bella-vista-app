@@ -173,6 +173,7 @@ export async function bestellungStatusAendern(id: number, formData: FormData) {
 export async function rechnungErstellen(bestellung_id: number, formData: FormData) {
   const gast_id_raw = formData.get("gast_id") as string;
   const gast_id = gast_id_raw ? parseInt(gast_id_raw, 10) : null;
+  const trinkgeld = parseFloat((formData.get("trinkgeld") as string) || "0") || 0;
 
   // Summe aus gespeichertem Einzelpreis berechnen (historisch korrekt, BR #5)
   const bestellung = await db.bestellung.findUnique({
@@ -204,6 +205,7 @@ export async function rechnungErstellen(bestellung_id: number, formData: FormDat
       gesamt_betrag,
       gast_id,
       bella_card_rabatt,
+      trinkgeld,
     },
   });
 
@@ -240,6 +242,20 @@ export async function zahlungHinzufuegen(
 
   await db.zahlung.create({
     data: { rechnung_id, betrag, zahlungsart },
+  });
+
+  revalidatePath(`/bestellungen/${bestellung_id}/rechnung`);
+  redirect(`/bestellungen/${bestellung_id}/rechnung?rechnung_id=${rechnung_id}`);
+}
+
+// BV-108: TSE-Stub — reiner Statusmarker, keine echte Kassenkopplung (siehe ADR-007)
+export async function alsAnTseUebermitteltMarkieren(
+  rechnung_id: number,
+  bestellung_id: number
+) {
+  await db.rechnung.update({
+    where: { id: rechnung_id },
+    data: { tse_uebermittelt: true, tse_uebermittlungszeitpunkt: new Date() },
   });
 
   revalidatePath(`/bestellungen/${bestellung_id}/rechnung`);

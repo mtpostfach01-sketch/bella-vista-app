@@ -70,7 +70,7 @@ Die App soll diese Abläufe intern digitalisieren, **ohne** den persönlichen, t
 
 ## 2. Beziehungen
 
-Briefing-Vorgabe: 6–9 Beziehungen, mind. 1× n:m. **Erfüllt:** 29 Beziehungen, davon **7 echte n:m**.
+Briefing-Vorgabe: 6–9 Beziehungen, mind. 1× n:m. **Erfüllt:** 30 Beziehungen, davon **7 echte n:m**.
 
 | # | Beziehung | Kardinalität | Hinweis |
 |---|-----------|--------------|---------|
@@ -103,6 +103,7 @@ Briefing-Vorgabe: 6–9 Beziehungen, mind. 1× n:m. **Erfüllt:** 29 Beziehungen
 | 27 | Firmenkunde — beauftragt — Catering-Auftrag | 1:n | |
 | 28 | **Catering-Auftrag — umfasst — Gericht** | **n:m** | |
 | 29 | **Trinkgeld(-topf) pro Abend — verteilt auf — Mitarbeiter** | **n:m** | |
+| 30 | Catering-Auftrag — erzeugt — Bestellung | 1:n | siehe Widerspruch W9 |
 
 **Wichtigste n:m-Beziehung:** *Bestellung — enthält — Gericht* (#17), aufgelöst über die Verbindungsentität **Bestellposition** mit den Beziehungsattributen Menge und Sonderwunsch.
 
@@ -140,7 +141,7 @@ Briefing-Vorgabe: 4–5 Regeln. **Erfüllt:** 23 Regeln (Format „Wenn A, dann 
 
 ## 4. Widersprüche (erkannt & aufgelöst)
 
-Briefing-Vorgabe: 2 explizit aufgelöste Widersprüche. **Erfüllt:** 8.
+Briefing-Vorgabe: 2 explizit aufgelöste Widersprüche. **Erfüllt:** 9.
 
 **W1 — Telefonisch vs. digital.**
 Aussage A: „Telefonisch, das ist unser Weg — und das will ich auch so behalten."
@@ -181,6 +182,11 @@ B: Fremde 15-Personen-Gruppe, die nicht erscheint, „das schmerzt".
 A: „Das mit dem Abholen … das tracken wir gar nicht. Kein Thema für die App."
 B: Will Umsatz und beliebteste Gerichte auswerten.
 → **Auflösung:** Abholungen werden als **Bestellart** miterfasst (rein intern, kein Bestellservice nach außen), damit Umsatz und Gericht-Statistik vollständig und korrekt sind.
+
+**W9 — Catering als Bestellart vs. Catering als eigenes Event-Geschäft.**
+A: Entität 6 (Bestellung) führt „Catering" als eine von drei Bestellarten (Vor-Ort / Abholung / Catering).
+B: Marco beschreibt Catering wie ein eigenständiges Geschäftsfeld mit eigenem Ablauf: „Da muss ich Angebote schreiben und Aufträge irgendwo tracken … Firmenkunden, Eventdatum, Menüauswahl, Lieferadresse" (Interview, Zeile 178) — modelliert als eigene Entität **Catering-Auftrag** mit Firmenkunde-Bezug, nicht als Position an einem Tisch.
+→ **Auflösung:** **Catering-Auftrag** ist die führende Entität für das Event-Geschäft (Angebot, Menüauswahl, Lieferadresse, Status). Bei Bestätigung erzeugt ein Catering-Auftrag optional eine oder mehrere **Bestellungen** mit Bestellart = Catering (für Küche/Rechnung/Kennzahlen) — die Beziehung Catering-Auftrag → Bestellung (1:n) wird in §2 ergänzt. „Catering" als Bestellart bleibt bestehen, ist aber ein Ergebnis des Catering-Auftrags, kein Parallelkonzept.
 
 ---
 

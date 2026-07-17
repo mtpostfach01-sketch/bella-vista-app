@@ -70,8 +70,14 @@ export default async function SpeisekartePage({
           </a>
         ))}
         <Link
-          href="/speisekarte/allergene"
+          href="/speisekarte/gruppenmenues"
           className="ml-auto px-3 py-1.5 text-sm text-gray-500 hover:text-gray-900"
+        >
+          Gruppenmenüs →
+        </Link>
+        <Link
+          href="/speisekarte/allergene"
+          className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-900"
         >
           Allergene →
         </Link>
@@ -112,6 +118,15 @@ export default async function SpeisekartePage({
                           !g.verfuegbar ? "opacity-60" : ""
                         }`}
                       >
+                        <div className="flex items-center gap-3">
+                        {g.foto_url && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={g.foto_url}
+                            alt={g.name}
+                            className="h-12 w-12 object-cover rounded-md border border-gray-200 flex-shrink-0"
+                          />
+                        )}
                         <div>
                           <div className="font-medium text-gray-900">
                             {g.name}
@@ -142,6 +157,7 @@ export default async function SpeisekartePage({
                               {g.beschreibung}
                             </div>
                           )}
+                        </div>
                         </div>
                         <div className="flex items-center gap-2">
                           {/* BV-014: Ausverkauft-Toggle */}

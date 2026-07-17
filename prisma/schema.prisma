@@ -13,26 +13,30 @@ model Standort {
   name    String @unique
   adresse String
 
-  bereiche       Bereich[]
-  tische         Tisch[]
-  reservierungen Reservierung[]
-  speisekarte    Speisekarte?
-  bestellungen   Bestellung[]
-  mitarbeiter    Mitarbeiter[]
-  warteliste     Warteliste[]
+  bereiche              Bereich[]
+  tische                Tisch[]
+  reservierungen        Reservierung[]
+  speisekarte           Speisekarte?
+  bestellungen          Bestellung[]
+  mitarbeiter           Mitarbeiter[]
+  warteliste            Warteliste[]
+  schichten             Schicht[]
+  trinkgeldverteilungen Trinkgeldverteilung[]
+  gruppenmenues         Gruppenmenue[]
+  cateringAuftraege     CateringAuftrag[]
 }
 
 // ─── Gast (standortübergreifend, ADR-003) ─────────────────────
 model Gast {
-  id            Int     @id @default(autoincrement())
-  vorname       String
-  nachname      String
-  telefon       String  @unique
-  email         String?
-  notiz         String?
+  id             Int     @id @default(autoincrement())
+  vorname        String
+  nachname       String
+  telefon        String  @unique
+  email          String?
+  notiz          String?
   lieblingstisch String? // CRM: bevorzugter Tisch (Freitext, z. B. "Tisch 4 Terrasse")
-  bella_card    Boolean @default(false)
-  besuchsanzahl Int     @default(0)
+  bella_card     Boolean @default(false)
+  besuchsanzahl  Int     @default(0)
 
   reservierungen Reservierung[]
   rechnungen     Rechnung[]
@@ -68,18 +72,24 @@ model Tisch {
 
 // ─── Reservierung ─────────────────────────────────────────────
 model Reservierung {
-  id             Int      @id @default(autoincrement())
-  datum_uhrzeit  DateTime
-  personenanzahl Int
-  status         String   @default("BESTAETIGT") // BESTAETIGT | NO_SHOW | STORNIERT | ERSCHIENEN
-  notiz          String?
-  erstellt_am    DateTime @default(now())
-  gast_id        Int
-  tisch_id       Int?
-  standort_id    Int
-  gast           Gast     @relation(fields: [gast_id], references: [id])
-  tisch          Tisch?   @relation(fields: [tisch_id], references: [id])
-  standort       Standort @relation(fields: [standort_id], references: [id])
+  id                Int           @id @default(autoincrement())
+  datum_uhrzeit     DateTime
+  personenanzahl    Int
+  status            String        @default("BESTAETIGT") // BESTAETIGT | NO_SHOW | STORNIERT | ERSCHIENEN
+  notiz             String?
+  erstellt_am       DateTime      @default(now())
+  gast_id           Int
+  tisch_id          Int?
+  standort_id       Int
+  gruppenmenue_id   Int? // BR #6: ab Schwellwert vorgeschlagen
+  anzahlung_betrag  Float? // BR #23: optional, fallweise
+  anzahlung_bezahlt Boolean       @default(false)
+  gast              Gast          @relation(fields: [gast_id], references: [id])
+  tisch             Tisch?        @relation(fields: [tisch_id], references: [id])
+  standort          Standort      @relation(fields: [standort_id], references: [id])
+  gruppenmenue      Gruppenmenue? @relation(fields: [gruppenmenue_id], references: [id])
+
+  erinnerung Erinnerung?
 }
 
 // ─── Mitarbeiter ──────────────────────────────────────────────
@@ -88,11 +98,13 @@ model Mitarbeiter {
   vorname     String
   nachname    String
   email       String    @unique
-  rolle       String    // CHEF | MANAGER | BEDIENUNG
-  standort_id Int?      // null = Chef (alle Standorte)
+  rolle       String // CHEF | MANAGER | BEDIENUNG
+  standort_id Int? // null = Chef (alle Standorte)
   standort    Standort? @relation(fields: [standort_id], references: [id])
 
-  bestellungen Bestellung[]
+  bestellungen          Bestellung[]
+  schichten             Schicht[]
+  trinkgeldverteilungen Trinkgeldverteilung[]
 }
 
 // ─── Speisekarte ──────────────────────────────────────────────
@@ -130,12 +142,14 @@ model Gericht {
   preis            Float
   verfuegbar       Boolean   @default(true)
   ist_grillgericht Boolean   @default(false) // BR #8: nur Kreuzberg
+  foto_url         String? // BV-109
   kategorie_id     Int
   kategorie        Kategorie @relation(fields: [kategorie_id], references: [id])
 
-  allergene         GerichtAllergen[]
-  bestellpositionen Bestellposition[]
-  tagesgerichte     Tagesgericht[]
+  allergene          GerichtAllergen[]
+  bestellpositionen  Bestellposition[]
+  tagesgerichte      Tagesgericht[]
+  cateringPositionen CateringPosition[]
 }
 
 model GerichtAllergen {
@@ -159,16 +173,18 @@ model Tagesgericht {
 
 // ─── Bestellung ───────────────────────────────────────────────
 model Bestellung {
-  id             Int         @id @default(autoincrement())
-  status         String      @default("OFFEN") // OFFEN | IN_ZUBEREITUNG | SERVIERT | BEZAHLT | STORNIERT
-  bestellart     String      @default("TISCH") // TISCH | ABHOLUNG (BV-107)
-  erstellt_am    DateTime    @default(now())
-  tisch_id       Int?        // optional: null bei Abholung (BV-107)
-  standort_id    Int
-  mitarbeiter_id Int
-  tisch          Tisch?      @relation(fields: [tisch_id], references: [id])
-  standort       Standort    @relation(fields: [standort_id], references: [id])
-  mitarbeiter    Mitarbeiter @relation(fields: [mitarbeiter_id], references: [id])
+  id                  Int              @id @default(autoincrement())
+  status              String           @default("OFFEN") // OFFEN | IN_ZUBEREITUNG | SERVIERT | BEZAHLT | STORNIERT
+  bestellart          String           @default("TISCH") // TISCH | ABHOLUNG | CATERING (BV-107, W9)
+  erstellt_am         DateTime         @default(now())
+  tisch_id            Int? // optional: null bei Abholung/Catering (BV-107, W9)
+  standort_id         Int
+  mitarbeiter_id      Int
+  catering_auftrag_id Int? // W9: gesetzt, wenn aus Catering-Auftrag erzeugt
+  tisch               Tisch?           @relation(fields: [tisch_id], references: [id])
+  standort            Standort         @relation(fields: [standort_id], references: [id])
+  mitarbeiter         Mitarbeiter      @relation(fields: [mitarbeiter_id], references: [id])
+  cateringAuftrag     CateringAuftrag? @relation(fields: [catering_auftrag_id], references: [id])
 
   positionen     Bestellposition[]
   kuechenauftrag Kuechenauftrag?
@@ -178,7 +194,7 @@ model Bestellung {
 model Bestellposition {
   id            Int        @id @default(autoincrement())
   menge         Int
-  einzelpreis   Float      // Preis zum Zeitpunkt der Bestellung (historisch korrekt)
+  einzelpreis   Float // Preis zum Zeitpunkt der Bestellung (historisch korrekt)
   notiz         String?
   status        String     @default("OFFEN") // OFFEN | IN_ZUBEREITUNG | FERTIG
   bestellung_id Int
@@ -198,14 +214,17 @@ model Kuechenauftrag {
 
 // ─── Rechnung + Zahlung ───────────────────────────────────────
 model Rechnung {
-  id                Int        @id @default(autoincrement())
-  bella_card_rabatt Boolean    @default(false)
-  gesamt_betrag     Float
-  erstellt_am       DateTime   @default(now())
-  bestellung_id     Int
-  gast_id           Int?
-  bestellung        Bestellung @relation(fields: [bestellung_id], references: [id])
-  gast              Gast?      @relation(fields: [gast_id], references: [id])
+  id                          Int        @id @default(autoincrement())
+  bella_card_rabatt           Boolean    @default(false)
+  gesamt_betrag               Float
+  trinkgeld                   Float      @default(0)
+  erstellt_am                 DateTime   @default(now())
+  bestellung_id               Int
+  gast_id                     Int?
+  tse_uebermittelt            Boolean    @default(false) // BV-108: Stub, siehe ADR-007
+  tse_uebermittlungszeitpunkt DateTime?
+  bestellung                  Bestellung @relation(fields: [bestellung_id], references: [id])
+  gast                        Gast?      @relation(fields: [gast_id], references: [id])
 
   zahlungen Zahlung[]
 }
@@ -213,19 +232,100 @@ model Rechnung {
 model Zahlung {
   id          Int      @id @default(autoincrement())
   betrag      Float
-  zahlungsart String   // BAR | KARTE
+  zahlungsart String // BAR | KARTE
   rechnung_id Int
   rechnung    Rechnung @relation(fields: [rechnung_id], references: [id])
 }
 
 // ─── Warteliste (BV-102) ──────────────────────────────────────
 model Warteliste {
-  id                    Int      @id @default(autoincrement())
+  id                       Int      @id @default(autoincrement())
   gewuenschte_personenzahl Int
-  notiz                 String?
-  erstellt_am           DateTime @default(now())
-  gast_id               Int
-  standort_id           Int
-  gast                  Gast     @relation(fields: [gast_id], references: [id])
-  standort              Standort @relation(fields: [standort_id], references: [id])
+  notiz                    String?
+  erstellt_am              DateTime @default(now())
+  gast_id                  Int
+  standort_id              Int
+  gast                     Gast     @relation(fields: [gast_id], references: [id])
+  standort                 Standort @relation(fields: [standort_id], references: [id])
+}
+
+// ─── Schicht (BV-103) ─────────────────────────────────────────
+model Schicht {
+  id             Int         @id @default(autoincrement())
+  datum          DateTime
+  von            String // "18:00"
+  bis            String // "23:00"
+  einspring_flag Boolean     @default(false) // Mitarbeiter springt an anderem Standort ein
+  mitarbeiter_id Int
+  standort_id    Int
+  mitarbeiter    Mitarbeiter @relation(fields: [mitarbeiter_id], references: [id])
+  standort       Standort    @relation(fields: [standort_id], references: [id])
+}
+
+// ─── Trinkgeldverteilung (BV-103) ──────────────────────────────
+// Vom Chef bestätigtes Ergebnis der Trinkgeld-Aufteilung eines Abends (BR #20)
+model Trinkgeldverteilung {
+  id             Int         @id @default(autoincrement())
+  datum          DateTime
+  betrag         Float
+  bestaetigt_am  DateTime    @default(now())
+  mitarbeiter_id Int
+  standort_id    Int
+  mitarbeiter    Mitarbeiter @relation(fields: [mitarbeiter_id], references: [id])
+  standort       Standort    @relation(fields: [standort_id], references: [id])
+}
+
+// ─── Erinnerung (BV-101, SMS-Erinnerung simuliert) ─────────────
+model Erinnerung {
+  id               Int          @id @default(autoincrement())
+  versandzeitpunkt DateTime
+  status           String       @default("GEPLANT") // GEPLANT | VERSENDET
+  reservierung_id  Int          @unique
+  reservierung     Reservierung @relation(fields: [reservierung_id], references: [id])
+}
+
+// ─── Gruppenmenü (BV-105) ───────────────────────────────────────
+model Gruppenmenue {
+  id              Int      @id @default(autoincrement())
+  bezeichnung     String
+  fixpreis        Float
+  ab_personenzahl Int      @default(8) // BR #6
+  standort_id     Int
+  standort        Standort @relation(fields: [standort_id], references: [id])
+
+  reservierungen Reservierung[]
+}
+
+// ─── Firmenkunde + Catering-Auftrag (BV-104, W9) ───────────────
+model Firmenkunde {
+  id              Int    @id @default(autoincrement())
+  name            String
+  ansprechpartner String
+  telefon         String
+
+  cateringAuftraege CateringAuftrag[]
+}
+
+model CateringAuftrag {
+  id             Int         @id @default(autoincrement())
+  event_datum    DateTime
+  lieferadresse  String
+  status         String      @default("ANGEBOT") // ANGEBOT | BESTAETIGT | ABGESCHLOSSEN | STORNIERT
+  erstellt_am    DateTime    @default(now())
+  firmenkunde_id Int
+  standort_id    Int
+  firmenkunde    Firmenkunde @relation(fields: [firmenkunde_id], references: [id])
+  standort       Standort    @relation(fields: [standort_id], references: [id])
+
+  positionen   CateringPosition[]
+  bestellungen Bestellung[]
+}
+
+model CateringPosition {
+  id                  Int             @id @default(autoincrement())
+  menge               Int
+  catering_auftrag_id Int
+  gericht_id          Int
+  cateringAuftrag     CateringAuftrag @relation(fields: [catering_auftrag_id], references: [id])
+  gericht             Gericht         @relation(fields: [gericht_id], references: [id])
 }

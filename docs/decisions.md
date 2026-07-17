@@ -97,3 +97,52 @@ Die einzigen Operationen auf der Bella-Card sind: Prüfen ob aktiv (bei Rechnung
 - Einfachere Abfragen (kein JOIN)
 - Bella-Card-Status ist direkt auf dem Gast-Objekt verfügbar
 - Falls v2 Druckkarten erfordert: Migration zu eigener Entität nötig (ADR-004 prüfen)
+
+---
+
+## ADR-007 — TSE-Anbindung als Stub (ergänzt ADR-004)
+
+**Status:** Entschieden (Juli 2026)
+**Kontext:** BV-108 wurde nachträglich aus dem v2-Backlog gezogen. ADR-004
+hält weiterhin fest, dass v1 keine Annahmen über die echte TSE-Schnittstelle
+trifft — diese ist unbekannt, Marco selbst kann sie nicht spezifizieren
+(„das ist euer Bereich, ich bin Koch, kein Informatiker").
+
+**Entscheidung:** `Rechnung` bekommt zwei Felder (`tse_uebermittelt`,
+`tse_uebermittlungszeitpunkt`) und einen manuellen Button „Als an TSE
+übermittelt markieren". Es findet **kein** echter Netzwerkaufruf, keine
+TSE-Bibliothek und keine Annahme über Protokoll/Datenformat der echten Kasse
+statt — reiner Statusmarker im Datenmodell.
+
+**Begründung:** Ohne reale Schnittstellen-Dokumentation wäre jede
+„Integration" eine unbegründete Annahme (widerspräche ADR-004). Ein
+Statusmarker zeigt das Konzept im Datenmodell, ohne eine Anbindung
+vorzutäuschen, die nicht existiert.
+
+**Konsequenz:** ADR-004 bleibt in der Sache gültig (keine echte Kopplung in
+v1). Die echte TSE-Integration ist weiterhin offen und wird in v2 mit
+konkreter Schnittstellen-Doku geklärt.
+
+---
+
+## ADR-008 — Trinkgeld-Verteilschlüssel: proportional zum Umsatz
+
+**Status:** Entschieden (Juli 2026)
+**Kontext:** `SPEC.md` §6, offene Frage 4 („Trinkgeld-Verteilschlüssel —
+wie genau wird aufgeteilt?") war zum Zeitpunkt von ADR-005 noch nicht
+festgelegt, nur „Chef bestätigt" (BR #20).
+
+**Entscheidung:** Der Trinkgeld-Topf eines Abends/Standorts (Summe
+`Rechnung.trinkgeld`) wird als Vorschlag proportional zum durch die
+Bestellungen erzielten Umsatz pro Mitarbeiter (`Bestellung.mitarbeiter_id` →
+`Rechnung.gesamt_betrag`) verteilt. Der Chef sieht den Vorschlag, kann jeden
+Betrag manuell überschreiben und bestätigt final (`Trinkgeldverteilung`).
+
+**Begründung:** Interview, Marcos eigenes Beispiel: „Wenn die App sagt
+‚Schmidt hat heute Abend Tisch 3, 5 und 7 bedient, Gesamtumsatz soundso' —
+dann kann ich fair aufteilen. Automatisch berechnen, ja, aber ich will das
+letzte Wort haben."
+
+**Konsequenz:** Neues Modell `Trinkgeldverteilung` speichert nur das
+bestätigte Ergebnis, nicht den Berechnungsweg — der Vorschlag wird bei jedem
+Aufruf neu aus den Rohdaten berechnet (kein gespeicherter Zwischenstand).

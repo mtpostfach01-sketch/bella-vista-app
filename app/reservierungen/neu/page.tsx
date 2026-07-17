@@ -42,6 +42,12 @@ export default async function ReservierungNeuPage({
 
   const heute = new Date().toISOString().split("T")[0];
 
+  // BV-105: Gruppenmenüs für Auswahl (BR #6, ab Schwellwert je Standort)
+  const gruppenmenues = await db.gruppenmenue.findMany({
+    include: { standort: true },
+    orderBy: { standort: { name: "asc" } },
+  });
+
   return (
     <div className="max-w-md">
       <h1 className="text-xl font-semibold text-gray-900 mb-6">
@@ -217,6 +223,43 @@ export default async function ReservierungNeuPage({
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
           />
         </div>
+
+        {/* BV-105: Gruppenmenü + Anzahlung — ab BR #6-Schwellwert empfohlen, aber fallweise/optional (W7) */}
+        <fieldset className="border border-gray-200 rounded-lg p-3 space-y-3">
+          <legend className="text-xs text-gray-500 px-1">
+            Gruppen (ab 8 Personen empfohlen)
+          </legend>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Gruppenmenü (optional)
+            </label>
+            <select
+              name="gruppenmenue_id"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+            >
+              <option value="">Kein Gruppenmenü (à la carte)</option>
+              {gruppenmenues.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.standort.name} — {g.bezeichnung} ({g.fixpreis.toFixed(2)} €,
+                  ab {g.ab_personenzahl} Pers.)
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Anzahlung (€, optional — fallweise, BR #23)
+            </label>
+            <input
+              name="anzahlung_betrag"
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="0.00"
+              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+            />
+          </div>
+        </fieldset>
 
         <div className="flex gap-3 pt-2">
           <button

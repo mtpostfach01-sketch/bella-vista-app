@@ -45,7 +45,7 @@ Vollständige Entitäten und Beziehungen: `docs/spec.md` §1 & §2.
 **Kern-Entitäten Phase 1:**
 Standort · Gast · Tisch · Bereich · Reservierung · Speisekarte · Gericht · Kategorie · Allergen · Bestellung · Bestellposition · Küchenauftrag · Rechnung · Zahlung · Mitarbeiter · Rolle
 
-**Erweiterte Entitäten (Phase 2+):**
+**Erweiterte Entitäten (Phase 2+, alle implementiert):**
 Bella-Card · Tagesgericht · Lieferant · Schicht · Erinnerung · Warteliste · Gruppenmenü · Catering-Auftrag · Firmenkunde
 
 ---

@@ -1,7 +1,11 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { rechnungErstellen, zahlungHinzufuegen } from "../../actions";
+import {
+  rechnungErstellen,
+  zahlungHinzufuegen,
+  alsAnTseUebermitteltMarkieren,
+} from "../../actions";
 
 export default async function RechnungPage({
   params,
@@ -109,6 +113,20 @@ export default async function RechnungPage({
               </select>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Trinkgeld (€, optional)
+              </label>
+              <input
+                name="trinkgeld"
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0.00"
+                className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+              />
+            </div>
+
             {/* BV-010: Hinweis Bella-Card */}
             <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
               <div className="font-medium mb-1">
@@ -153,6 +171,12 @@ export default async function RechnungPage({
             <div className="text-sm text-gray-500">
               Gesamt:{" "}
               <strong>{existierendeRechnung.gesamt_betrag.toFixed(2)} €</strong>
+              {existierendeRechnung.trinkgeld > 0 && (
+                <>
+                  {" · "}Trinkgeld:{" "}
+                  <strong>{existierendeRechnung.trinkgeld.toFixed(2)} €</strong>
+                </>
+              )}
               {" · "}Offen:{" "}
               <strong>
                 {Math.max(
@@ -166,6 +190,36 @@ export default async function RechnungPage({
                 €
               </strong>
             </div>
+          </div>
+
+          {/* BV-108: TSE-Stub — reiner Statusmarker, keine echte Kassenkopplung */}
+          <div className="mb-4 flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+            {existierendeRechnung.tse_uebermittelt ? (
+              <span className="text-gray-600">
+                An TSE übermittelt am{" "}
+                {new Date(
+                  existierendeRechnung.tse_uebermittlungszeitpunkt!
+                ).toLocaleString("de-DE")}
+              </span>
+            ) : (
+              <>
+                <span className="text-gray-500">Noch nicht an TSE übermittelt</span>
+                <form
+                  action={alsAnTseUebermitteltMarkieren.bind(
+                    null,
+                    existierendeRechnung.id,
+                    bestellung.id
+                  )}
+                >
+                  <button
+                    type="submit"
+                    className="px-3 py-1.5 text-xs border border-gray-300 text-gray-700 rounded-md hover:bg-gray-100"
+                  >
+                    Als an TSE übermittelt markieren
+                  </button>
+                </form>
+              </>
+            )}
           </div>
 
           {existierendeRechnung.zahlungen.length > 0 ? (

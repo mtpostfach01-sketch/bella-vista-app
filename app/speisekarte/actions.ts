@@ -36,6 +36,7 @@ export async function gerichtAnlegen(formData: FormData) {
   const preis = parseFloat(formData.get("preis") as string);
   const verfuegbar = formData.get("verfuegbar") === "true";
   const ist_grillgericht = formData.get("ist_grillgericht") === "on";
+  const foto_url = (formData.get("foto_url") as string)?.trim() || null;
   const allergen_ids = formData
     .getAll("allergen_ids")
     .map((v) => parseInt(v as string, 10));
@@ -47,6 +48,7 @@ export async function gerichtAnlegen(formData: FormData) {
       preis,
       verfuegbar,
       ist_grillgericht,
+      foto_url,
       kategorie_id,
     },
   });
@@ -72,6 +74,7 @@ export async function gerichtBearbeiten(id: number, formData: FormData) {
   const preis = parseFloat(formData.get("preis") as string);
   const verfuegbar = formData.get("verfuegbar") === "true";
   const ist_grillgericht = formData.get("ist_grillgericht") === "on";
+  const foto_url = (formData.get("foto_url") as string)?.trim() || null;
   const kategorie_id = parseInt(formData.get("kategorie_id") as string, 10);
   const allergen_ids = formData
     .getAll("allergen_ids")
@@ -85,6 +88,7 @@ export async function gerichtBearbeiten(id: number, formData: FormData) {
       preis,
       verfuegbar,
       ist_grillgericht,
+      foto_url,
       kategorie_id,
     },
   });

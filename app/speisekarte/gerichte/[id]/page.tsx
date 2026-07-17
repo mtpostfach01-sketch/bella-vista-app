@@ -148,6 +148,27 @@ export default async function GerichtBearbeitenPage({
           </label>
         </div>
 
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Foto-URL (optional)
+          </label>
+          <input
+            name="foto_url"
+            type="url"
+            defaultValue={gericht.foto_url ?? ""}
+            placeholder="https://…"
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+          />
+          {gericht.foto_url && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={gericht.foto_url}
+              alt={gericht.name}
+              className="mt-2 h-24 w-24 object-cover rounded-md border border-gray-200"
+            />
+          )}
+        </div>
+
         {allergene.length > 0 && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
