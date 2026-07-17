@@ -17,7 +17,11 @@ nachträglichen Hinzufügen einer Position zu einer bestehenden Bestellung.
 `app/bestellungen/actions.ts` (`bestellungAnlegen` Zeile 52,
 `positionHinzufuegen` Zeile 123) — beide brechen mit
 `redirect(...?error=grillgericht_spandau)` ab, sobald
-`gericht.ist_grillgericht && standort.name === "Spandau"`.
+`gericht.ist_grillgericht && standort.name === "Spandau"`. Konkretes
+Beispiel im Demo-Datensatz: „Bistecca alla Fiorentina" (Gericht-ID 8,
+`ist_grillgericht = true`) existiert ausschließlich in der Kreuzberger
+Speisekarte — die Spandauer Karte enthält keine einzige Grillposition,
+weil sie beim Seeding gar nicht erst angelegt wurde.
 
 ---
 
@@ -34,7 +38,13 @@ Positionskategorien.
 `app/bestellungen/actions.ts` (Zeile 173–226): `besuchsanzahl >= 10` setzt
 `bella_card = true` (Zeile 220–225); der Rabatt wird pauschal auf
 `summe * 0.85` (Zeile 198–199, alle Positionen ungefiltert) berechnet,
-keine Kategorie-Ausnahme im Code.
+keine Kategorie-Ausnahme im Code. Konkreter Beleg im Demo-Datensatz: Gast
+„Klaus Bergmann" (12 Besuche, `bella_card = true`) hat eine Rechnung mit
+2× Spaghetti Carbonara (14 €), 1× Hausrotwein (5,50 €), 2× Tiramisu
+(6,50 €) = 46,50 € Zwischensumme, davon inkl. Getränk & Dessert 15 %
+abgezogen → `gesamt_betrag = 39,53 €`, `bella_card_rabatt = true`
+(nachvollziehbar unter `/gaeste/2` bzw. in der Rechnung zu seiner
+Bestellung #2).
 
 ---
 
@@ -49,7 +59,12 @@ Beziehungsattributen Menge und (historisch fixiertem) Einzelpreis.
 **Wie geprüft?** `prisma/schema.prisma` direkt gelesen: `Bestellposition`
 trägt sowohl `bestellung_id` als auch `gericht_id` als Fremdschlüssel plus
 die Zusatzattribute `menge` und `einzelpreis` — klassische
-n:m-Auflösung mit Beziehungsattributen.
+n:m-Auflösung mit Beziehungsattributen. Im Demo-Datensatz z. B.
+Bestellung #2 (Bergmann, Tisch 4): drei Bestellpositionen verweisen auf
+drei verschiedene Gerichte (Spaghetti Carbonara, Hausrotwein, Tiramisu),
+jede mit eigener Menge und zum Bestellzeitpunkt fixiertem Einzelpreis —
+dasselbe Gericht taucht umgekehrt in mehreren Bestellungen auf (z. B.
+Lasagne al Forno sowohl in Bestellung #3 als auch im Speisekarten-Seed).
 
 ---
 
@@ -63,10 +78,12 @@ normalen Bestellung, sondern erzeugt eine.
 
 **Konfidenz:** 10/10
 
-**Wie geprüft?** Live gegen die echte Datenbank getestet (Skript via
-Prisma Client): CateringAuftrag mit einer Position angelegt, bestätigt,
-und geprüft, dass genau eine `Bestellung` mit `bestellart = "CATERING"`
-und derselben Positionsmenge entsteht.
+**Wie geprüft?** Live gegen die echte Datenbank getestet und im
+Demo-Datensatz nachvollziehbar: Catering-Auftrag #1 für den Firmenkunden
+„TechCorp" (Status `BESTAETIGT`, sichtbar unter `/catering/1`) hat genau
+eine zugehörige Bestellung #1 mit `bestellart = "CATERING"` und
+`catering_auftrag_id = 1` erzeugt — beide Datensätze sind über
+`/catering/1` bzw. `/bestellungen/1` im laufenden System einsehbar.
 
 ---
 
@@ -80,8 +97,11 @@ Vorschlag vorausgefüllt, kann aber jeden Betrag vor dem Bestätigen frei
 
 **Konfidenz:** 9/10
 
-**Wie geprüft?** Live getestet: Testrechnung mit 15,50 € Trinkgeld und
-einem Mitarbeiter angelegt, `/trinkgeld` im Browser aufgerufen — Vorschlag
-erschien korrekt vorausgefüllt in einem editierbaren `<input>`-Feld
-(`betrag_<mitarbeiter_id>`), das die Bestätigungs-Action unverändert oder
-überschrieben entgegennimmt.
+**Wie geprüft?** Live gegen den Demo-Datensatz getestet: An einem Tag in
+Kreuzberg gibt es zwei bezahlte Rechnungen — Marco Ferretti bediente eine
+Bestellung mit 250 € Umsatz (15,50 € Trinkgeld), Thomas Schmidt eine mit
+39,53 € Umsatz (4,50 € Trinkgeld). `/trinkgeld?standort_id=1` zeigt einen
+Topf von 20,00 € und schlägt die Aufteilung exakt proportional zum jeweils
+erzielten Umsatz vor (Marco ≈ 17,27 €, Schmidt ≈ 2,73 €) — beide Beträge
+bleiben in editierbaren `<input>`-Feldern (`betrag_<mitarbeiter_id>`)
+überschreibbar, bevor die Bestätigungs-Action greift.
