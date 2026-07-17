@@ -3,12 +3,19 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { mitarbeiterBearbeiten } from "../actions";
 
+const FEHLERMELDUNGEN: Record<string, string> = {
+  passwort_zu_kurz: "Das Passwort muss mindestens 4 Zeichen lang sein.",
+};
+
 export default async function MitarbeiterBearbeitenPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { id } = await params;
+  const { error } = await searchParams;
   const mitarbeiter = await db.mitarbeiter.findUnique({
     where: { id: Number(id) },
     include: { standort: true },
@@ -29,6 +36,12 @@ export default async function MitarbeiterBearbeitenPage({
         {mitarbeiter.rolle}
         {mitarbeiter.standort && ` · ${mitarbeiter.standort.name}`}
       </p>
+
+      {error && FEHLERMELDUNGEN[error] && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+          {FEHLERMELDUNGEN[error]}
+        </div>
+      )}
 
       <form action={bearbeiten} className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -65,6 +78,19 @@ export default async function MitarbeiterBearbeitenPage({
             type="email"
             required
             defaultValue={mitarbeiter.email}
+            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Neues Passwort (leer lassen, um es nicht zu ändern)
+          </label>
+          <input
+            name="passwort"
+            type="password"
+            minLength={4}
+            placeholder="Mind. 4 Zeichen"
             className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
           />
         </div>

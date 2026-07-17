@@ -9,19 +9,30 @@
  *              /trinkgeld, /erinnerungen, /speisekarte/* sind für BEDIENUNG
  *              damit ebenfalls automatisch gesperrt — nicht in der Allowlist)
  *
- * Ohne Session: alle Seiten erreichbar (für initiale Einrichtung / Tests).
- * Mit Session: Rolle wird aus Cookie gelesen (kein DB-Aufruf in Edge).
+ * Ohne Session: nur die Startseite (Login/Mitarbeiterauswahl) und die
+ * Erst-Einrichtung eines Mitarbeiters sind erreichbar — sonst könnte
+ * jeder ohne Anmeldung mit vollen Chef-Rechten arbeiten. Mit Session
+ * wird die Rolle aus dem Cookie gelesen (kein DB-Aufruf im Edge möglich).
  */
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+// Ohne Login erreichbar: Startseite (Login-Auswahl) und Mitarbeiter-Erst-
+// anlage (Bootstrap — ohne diese Ausnahme könnte man nie den ersten
+// Mitarbeiter anlegen, um sich überhaupt einzuloggen).
+const OHNE_LOGIN_ERLAUBT = ["/", "/mitarbeiter/neu"];
+
 export function proxy(request: NextRequest) {
   const rolle = request.cookies.get("mitarbeiter_rolle")?.value;
   const { pathname } = request.nextUrl;
 
-  // Ohne Session: alle Seiten zugänglich
-  if (!rolle) return NextResponse.next();
+  if (!rolle) {
+    if (OHNE_LOGIN_ERLAUBT.includes(pathname)) return NextResponse.next();
+    return NextResponse.redirect(
+      new URL("/?error=keine_session", request.url)
+    );
+  }
 
   // CHEF: Zugriff auf alles
   if (rolle === "CHEF") return NextResponse.next();
@@ -55,6 +66,6 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|session).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|icon.svg|session).*)",
   ],
 };

@@ -94,13 +94,14 @@ model Reservierung {
 
 // ─── Mitarbeiter ──────────────────────────────────────────────
 model Mitarbeiter {
-  id          Int       @id @default(autoincrement())
-  vorname     String
-  nachname    String
-  email       String    @unique
-  rolle       String // CHEF | MANAGER | BEDIENUNG
-  standort_id Int? // null = Chef (alle Standorte)
-  standort    Standort? @relation(fields: [standort_id], references: [id])
+  id            Int       @id @default(autoincrement())
+  vorname       String
+  nachname      String
+  email         String    @unique
+  rolle         String // CHEF | MANAGER | BEDIENUNG
+  passwort_hash String? // BV-016: verhindert, dass man sich als andere Rolle ausgibt
+  standort_id   Int? // null = Chef (alle Standorte)
+  standort      Standort? @relation(fields: [standort_id], references: [id])
 
   bestellungen          Bestellung[]
   schichten             Schicht[]

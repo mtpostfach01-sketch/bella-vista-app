@@ -7,11 +7,13 @@ const FEHLERMELDUNGEN: Record<string, string> = {
   kein_zugriff:
     "Kein Zugriff. Ihre Rolle erlaubt diese Seite nicht.",
   keine_session:
-    "Bitte zuerst einen Mitarbeiter auswählen.",
+    "Bitte zuerst anmelden.",
   mitarbeiter_nicht_gefunden:
     "Mitarbeiter nicht gefunden.",
   kein_mitarbeiter:
     "Bitte einen Mitarbeiter auswählen.",
+  falsches_passwort:
+    "Falsches Passwort.",
 };
 
 export default async function Home({
@@ -92,10 +94,10 @@ export default async function Home({
 
         {/* Mitarbeiter wechseln / auswählen */}
         {mitarbeiter.length > 0 ? (
-          <form action={sessionSetzen} className="flex gap-2 mt-3 pt-3 border-t border-gray-100">
+          <form action={sessionSetzen} className="space-y-2 mt-3 pt-3 border-t border-gray-100">
             <select
               name="mitarbeiter_id"
-              className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+              className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
               defaultValue=""
             >
               <option value="">Mitarbeiter wählen …</option>
@@ -106,12 +108,21 @@ export default async function Home({
                 </option>
               ))}
             </select>
-            <button
-              type="submit"
-              className="px-3 py-1.5 bg-gray-900 text-white text-sm rounded-md hover:bg-gray-700"
-            >
-              {aktiver ? "Wechseln" : "Anmelden"}
-            </button>
+            <div className="flex gap-2">
+              <input
+                name="passwort"
+                type="password"
+                placeholder="Passwort"
+                required
+                className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+              />
+              <button
+                type="submit"
+                className="px-3 py-1.5 bg-gray-900 text-white text-sm rounded-md hover:bg-gray-700"
+              >
+                {aktiver ? "Wechseln" : "Anmelden"}
+              </button>
+            </div>
           </form>
         ) : (
           <p className="text-xs text-gray-400 mt-2">
@@ -123,65 +134,74 @@ export default async function Home({
         )}
       </div>
 
-      {/* Navigation-Kacheln */}
-      <div className="grid grid-cols-2 gap-3">
-        <Link
-          href="/gaeste"
-          className="block p-4 bg-white rounded-lg border border-gray-200"
-        >
-          <div className="text-2xl mb-1">🧑‍🤝‍🧑</div>
-          <div className="font-medium text-gray-900">Gäste</div>
-          <div className="text-sm text-gray-500 mt-0.5">Anlegen &amp; suchen</div>
-        </Link>
-        <Link
-          href="/reservierungen"
-          className="block p-4 bg-white rounded-lg border border-gray-200"
-        >
-          <div className="text-2xl mb-1">📅</div>
-          <div className="font-medium text-gray-900">Reservierungen</div>
-          <div className="text-sm text-gray-500 mt-0.5">Heute &amp; kommende</div>
-        </Link>
-        <Link
-          href="/bestellungen"
-          className="block p-4 bg-white rounded-lg border border-gray-200"
-        >
-          <div className="text-2xl mb-1">🧾</div>
-          <div className="font-medium text-gray-900">Bestellungen</div>
-          <div className="text-sm text-gray-500 mt-0.5">Tisch aufnehmen</div>
-        </Link>
-        <Link
-          href="/speisekarte"
-          className="block p-4 bg-white rounded-lg border border-gray-200"
-        >
-          <div className="text-2xl mb-1">🍝</div>
-          <div className="font-medium text-gray-900">Speisekarte</div>
-          <div className="text-sm text-gray-500 mt-0.5">Gerichte verwalten</div>
-        </Link>
-        <Link
-          href="/tische"
-          className="block p-4 bg-white rounded-lg border border-gray-200"
-        >
-          <div className="text-2xl mb-1">🪑</div>
-          <div className="font-medium text-gray-900">Tische</div>
-          <div className="text-sm text-gray-500 mt-0.5">Status &amp; Bereiche</div>
-        </Link>
-        <Link
-          href="/catering"
-          className="block p-4 bg-white rounded-lg border border-gray-200"
-        >
-          <div className="text-2xl mb-1">🎉</div>
-          <div className="font-medium text-gray-900">Catering</div>
-          <div className="text-sm text-gray-500 mt-0.5">Events &amp; Firmenkunden</div>
-        </Link>
-        <Link
-          href="/mitarbeiter"
-          className="block p-4 bg-white rounded-lg border border-gray-200"
-        >
-          <div className="text-2xl mb-1">👤</div>
-          <div className="font-medium text-gray-900">Mitarbeiter</div>
-          <div className="text-sm text-gray-500 mt-0.5">Team verwalten</div>
-        </Link>
-      </div>
+      {/* Navigation-Kacheln — erst nach Login sichtbar, sonst würde jede
+          Kachel ohnehin nur zurück zum Login umleiten (proxy.ts) */}
+      {aktiver && (
+        <div className="grid grid-cols-2 gap-3">
+          <Link
+            href="/gaeste"
+            className="block p-4 bg-white rounded-lg border border-gray-200"
+          >
+            <div className="text-2xl mb-1">🧑‍🤝‍🧑</div>
+            <div className="font-medium text-gray-900">Gäste</div>
+            <div className="text-sm text-gray-500 mt-0.5">Anlegen &amp; suchen</div>
+          </Link>
+          <Link
+            href="/reservierungen"
+            className="block p-4 bg-white rounded-lg border border-gray-200"
+          >
+            <div className="text-2xl mb-1">📅</div>
+            <div className="font-medium text-gray-900">Reservierungen</div>
+            <div className="text-sm text-gray-500 mt-0.5">Heute &amp; kommende</div>
+          </Link>
+          <Link
+            href="/bestellungen"
+            className="block p-4 bg-white rounded-lg border border-gray-200"
+          >
+            <div className="text-2xl mb-1">🧾</div>
+            <div className="font-medium text-gray-900">Bestellungen</div>
+            <div className="text-sm text-gray-500 mt-0.5">Tisch aufnehmen</div>
+          </Link>
+          <Link
+            href="/tische"
+            className="block p-4 bg-white rounded-lg border border-gray-200"
+          >
+            <div className="text-2xl mb-1">🪑</div>
+            <div className="font-medium text-gray-900">Tische</div>
+            <div className="text-sm text-gray-500 mt-0.5">Status &amp; Bereiche</div>
+          </Link>
+          {/* Speisekarte, Catering, Mitarbeiter: für BEDIENUNG ohnehin
+              gesperrt (proxy.ts-Allowlist) — Kacheln nur für Chef/Manager */}
+          {aktiver.rolle !== "BEDIENUNG" && (
+            <>
+              <Link
+                href="/speisekarte"
+                className="block p-4 bg-white rounded-lg border border-gray-200"
+              >
+                <div className="text-2xl mb-1">🍝</div>
+                <div className="font-medium text-gray-900">Speisekarte</div>
+                <div className="text-sm text-gray-500 mt-0.5">Gerichte verwalten</div>
+              </Link>
+              <Link
+                href="/catering"
+                className="block p-4 bg-white rounded-lg border border-gray-200"
+              >
+                <div className="text-2xl mb-1">🎉</div>
+                <div className="font-medium text-gray-900">Catering</div>
+                <div className="text-sm text-gray-500 mt-0.5">Events &amp; Firmenkunden</div>
+              </Link>
+              <Link
+                href="/mitarbeiter"
+                className="block p-4 bg-white rounded-lg border border-gray-200"
+              >
+                <div className="text-2xl mb-1">👤</div>
+                <div className="font-medium text-gray-900">Mitarbeiter</div>
+                <div className="text-sm text-gray-500 mt-0.5">Team verwalten</div>
+              </Link>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

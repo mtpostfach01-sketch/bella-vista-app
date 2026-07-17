@@ -41,7 +41,9 @@ npm run dev
 
 App läuft auf `http://localhost:3000`.
 
-**Erster Schritt nach dem Start:** Auf der Startseite einen Mitarbeiter anlegen (`/mitarbeiter/neu`) und dann über das Auswahl-Widget anmelden.
+**Erster Schritt nach dem Start:** Auf der Startseite einen Mitarbeiter anlegen (`/mitarbeiter/neu`, mit Passwort) und dann über das Auswahl-Widget mit Passwort anmelden. Ohne gültiges Passwort ist keine Seite außer der Startseite erreichbar (BV-016).
+
+Falls die App mit den Demo-Daten läuft: Standard-Passwort für alle vorhandenen Test-Mitarbeiter ist `bellavista`.
 
 ---
 
@@ -100,7 +102,7 @@ bella-vista-app/
 | MANAGER | Nur eigener Standort + Speisekartenpflege |
 | BEDIENUNG | Nur Bestellungen, Reservierungen, Gäste, Tische |
 
-Anmeldung: Startseite → Mitarbeiter auswählen (kein Passwort, interne App).
+Anmeldung: Startseite → Mitarbeiter auswählen + Passwort eingeben. Ohne gültige Anmeldung ist außer der Startseite nichts erreichbar.
 
 ---
 

@@ -175,3 +175,30 @@ Spandau-Einträge manuell im Kopf sortieren müssen.
 standardmäßig nach diesem Muster (`db.standort.findMany({ include: {...} })`
 + Gruppen-Header) aufgebaut werden, nicht als ungruppierter `findMany` auf
 der Kind-Entität.
+
+---
+
+## ADR-010 — Passwort-Pflicht statt reiner Mitarbeiterauswahl
+
+**Status:** Entschieden (Juli 2026)
+**Kontext:** ADR-005 ließ die Auth-Strategie bewusst offen. In v1 genügte
+eine reine Namensauswahl ohne Passwort, um sich als Mitarbeiter anzumelden
+(BV-016). Das bedeutete: jede Bedienung konnte sich ohne jede Hürde als
+Chef ausgeben und hatte damit vollen Zugriff — die Rollenrechte griffen
+nur, solange sich niemand einfach als jemand anderes auswählte.
+
+**Entscheidung:** `Mitarbeiter` bekommt ein `passwort_hash`-Feld
+(Node-`crypto.scryptSync`, Salt+Hash, kein externes Package). Anlegen und
+Bearbeiten verlangen/erlauben ein Passwort (`lib/passwort.ts`). Der Login
+(`sessionSetzen`) prüft es, bevor die Session-Cookies gesetzt werden.
+`proxy.ts` leitet ohne gültige Session konsequent auf `/` um — einzige
+Ausnahme bleibt `/mitarbeiter/neu` (Bootstrap, sonst könnte nie ein erster
+Mitarbeiter angelegt werden, um sich überhaupt einzuloggen).
+
+**Begründung:** Ohne Passwort war BV-016 (Rollenbasierter Zugriff) in der
+Praxis wirkungslos, da die "Anmeldung" keine echte Hürde war.
+
+**Konsequenz:** Kein next-auth/OAuth — bewusst die einfachste Lösung, die
+das eigentliche Problem (Rollen-Mogeln) behebt, ohne die Architektur zu
+verkomplizieren. Vorhandene Demo-Mitarbeiter wurden nachträglich mit dem
+Passwort `bellavista` versehen (siehe README).

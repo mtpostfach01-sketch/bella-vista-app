@@ -4,7 +4,6 @@ import { Fraunces } from "next/font/google";
 import Link from "next/link";
 import { getAktiverMitarbeiter } from "@/lib/session";
 import { NavLink } from "./NavLink";
-import { Logo } from "./Logo";
 import { BottomNav } from "./BottomNav";
 import "./globals.css";
 
@@ -105,10 +104,9 @@ export default async function RootLayout({
         <nav className="bg-gradient-to-r from-teal-900 to-teal-800 shadow-md px-4 sm:px-6 py-3 flex items-center gap-1.5">
           <Link
             href="/"
-            className="font-heading text-xl font-semibold text-white tracking-tight mr-4 flex items-center gap-2"
+            className="font-heading text-xl font-semibold text-white tracking-tight mr-4"
           >
-            <Logo className="w-6 h-6 text-amber-400" />
-            <span className="hidden sm:inline">Bella Vista</span>
+            Bella Vista
           </Link>
 
           {/* Ab md: volle Nav-Reihe oben. Darunter übernimmt die BottomNav. */}
