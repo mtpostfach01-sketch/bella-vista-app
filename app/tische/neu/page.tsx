@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import Link from "next/link";
 import { tischAnlegen } from "../actions";
 
 export default async function TischNeuPage() {
@@ -98,12 +99,12 @@ export default async function TischNeuPage() {
           >
             Speichern
           </button>
-          <a
+          <Link
             href="/tische"
             className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
           >
             Abbrechen
-          </a>
+          </Link>
         </div>
       </form>
     </div>

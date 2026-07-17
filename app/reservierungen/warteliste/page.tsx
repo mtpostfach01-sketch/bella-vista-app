@@ -10,9 +10,10 @@ export default async function WartelistePage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const aktiver = await getAktiverMitarbeiter();
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
 
   const { error } = await searchParams;
+  const jetzt = new Date();
 
   // Standort-Filter für Manager
   const standortFilter =
@@ -153,7 +154,7 @@ export default async function WartelistePage({
           <div className="border border-gray-200 rounded-lg bg-white divide-y divide-gray-100">
             {warteliste.map((w, idx) => {
               const wartetSeit = Math.floor(
-                (Date.now() - new Date(w.erstellt_am).getTime()) / 60000
+                (jetzt.getTime() - new Date(w.erstellt_am).getTime()) / 60000
               );
               const entfernenAction = wartelisteEntfernen.bind(null, w.id);
 

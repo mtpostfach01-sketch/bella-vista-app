@@ -11,7 +11,7 @@ Digitale Reservierungsverwaltung, Tisch-zu-Küche-Bestellkette, Stammgast-CRM (B
 ## KI-Tool & Modell
 
 Dieses Projekt wurde mit **Claude Code** (Anthropic) entwickelt.  
-Modell: `claude-sonnet-4-6`
+Modelle: `claude-sonnet-4-6` (Grundgerüst, Phase 1–3) und `claude-sonnet-5` (v2-Features, Design, Bugfixes)
 
 ---
 
@@ -50,25 +50,31 @@ App läuft auf `http://localhost:3000`.
 ```
 bella-vista-app/
 ├── prisma/
-│   ├── schema.prisma      # Datenmodell (16 Tabellen, SQLite)
+│   ├── schema.prisma      # Datenmodell (25 Modelle, SQLite)
 │   └── seed.ts            # Stammdaten: Standorte, Bereiche, Allergene
 ├── app/                   # Next.js App Router
 │   ├── gaeste/            # BV-001 Gäste-CRUD
 │   ├── tische/            # BV-002 Tische je Standort
-│   ├── reservierungen/    # BV-003 Reservierungen
-│   ├── speisekarte/       # BV-004 Gerichte & Allergene
-│   ├── bestellungen/      # BV-005/006 Bestellungen & Rechnung
+│   ├── reservierungen/    # BV-003 Reservierungen + BV-102 Warteliste
+│   ├── speisekarte/       # BV-004 Gerichte & Allergene + BV-105 Gruppenmenüs + BV-109 Fotos
+│   ├── bestellungen/      # BV-005/006/107 Bestellungen, Abholung & Rechnung
+│   ├── catering/          # BV-104 Catering-Modul (Firmenkunden, Aufträge)
+│   ├── schichtplanung/    # BV-103 Schichtplanung
+│   ├── trinkgeld/         # BV-103 Trinkgeld-Vorschlag
+│   ├── erinnerungen/      # BV-101 SMS-Erinnerung (simuliert)
 │   ├── mitarbeiter/       # BV-007 Mitarbeiter & Rollen
 │   └── dashboard/         # BV-017/106 Chef-Dashboard & Kennzahlen
 ├── lib/
 │   ├── db.ts              # Prisma-Singleton
 │   ├── session.ts         # Cookie-Session (aktiver Mitarbeiter)
 │   └── oeffnungszeiten.ts # BR #9/#10: Öffnungszeiten-Hilfsfunktionen
+├── proxy.ts                # BV-016: Rollenbasiertes Routen-Gating (Next.js 16, ehem. middleware.ts)
 ├── docs/
-│   ├── spec.md            # Anforderungsmodell (25 Entitäten, 23 Business Rules)
-│   ├── backlog.md         # Feature-Register BV-001–BV-109
-│   ├── decisions.md       # Architekturentscheidungen (ADR-001–005)
+│   ├── spec.md            # Anforderungsmodell (25 Entitäten, 23 Business Rules, 9 Widersprüche)
+│   ├── backlog.md         # Feature-Register BV-001–BV-109 (alle Phasen abgeschlossen)
+│   ├── decisions.md       # Architekturentscheidungen (ADR-001–ADR-008)
 │   └── architecture.md   # Stack & Datenmodell
+├── KALIBRIERUNG.md         # 5 geprüfte Aussagen zur App (Kalibrierungs-Bewertung)
 └── CLAUDE.md              # Agent-Briefing
 ```
 
@@ -103,6 +109,7 @@ Anmeldung: Startseite → Mitarbeiter auswählen (kein Passwort, interne App).
 | BR | Regel |
 |----|-------|
 | #3–5 | Bella-Card ab 10 Besuchen, 15% Rabatt |
+| #6 | Gruppenmenü-Vorschlag ab 8 Personen |
 | #7 | Gruppenbereich nur Kreuzberg |
 | #8 | Grillgerichte nur Kreuzberg |
 | #9–10 | Öffnungszeiten standortspezifisch (KB: Di–So 12–15+18–23 Uhr / SP: Mi–So 17–22 Uhr) |
@@ -110,4 +117,9 @@ Anmeldung: Startseite → Mitarbeiter auswählen (kein Passwort, interne App).
 | #13 | Ausverkauft-Toggle sofort sichtbar |
 | #14–15 | No-Show nach 20 Min, Tisch → FREI |
 | #16–17 | Keine Doppelbelegung (±2h Zeitfenster) |
+| #20 | Trinkgeld-Vorschlag proportional zum Umsatz, Chef bestätigt |
 | #21 | Rollenbasierter Zugriff |
+| #22 | SMS-Erinnerung am Vortag (simuliert) |
+| #23 | Anzahlung bei Gruppen optional/fallweise |
+
+Alle 23 Business Rules aus `docs/spec.md` §3 sind implementiert.

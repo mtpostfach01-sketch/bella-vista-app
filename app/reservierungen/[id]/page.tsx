@@ -1,5 +1,6 @@
 import { db } from "@/lib/db";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { reservierungBearbeiten, noShowSetzen } from "../actions";
 
 const FEHLERMELDUNGEN: Record<string, string> = {
@@ -227,12 +228,12 @@ export default async function ReservierungBearbeitenPage({
           >
             Speichern
           </button>
-          <a
+          <Link
             href="/reservierungen"
             className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
           >
             Abbrechen
-          </a>
+          </Link>
         </div>
       </form>
     </div>

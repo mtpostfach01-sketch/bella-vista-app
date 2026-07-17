@@ -13,7 +13,7 @@ const STATUS_BADGE: Record<string, string> = {
 // BV-104: Catering-Modul (Firmenkunden, Events)
 export default async function CateringPage() {
   const aktiver = await getAktiverMitarbeiter();
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
   if (aktiver.rolle === "BEDIENUNG") redirect("/");
 
   const standortFilter =

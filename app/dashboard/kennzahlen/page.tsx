@@ -7,7 +7,7 @@ export default async function KennzahlenPage() {
   const aktiver = await getAktiverMitarbeiter();
 
   // BV-016: Nur CHEF und MANAGER
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
   if (aktiver.rolle === "BEDIENUNG") redirect("/");
 
   const jetzt = new Date();

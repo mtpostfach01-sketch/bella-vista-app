@@ -10,7 +10,7 @@ export default async function SchichtplanungPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const aktiver = await getAktiverMitarbeiter();
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
   if (aktiver.rolle === "BEDIENUNG") redirect("/");
 
   const { error } = await searchParams;

@@ -1,6 +1,7 @@
 import { db } from "@/lib/db";
 import { getAktiverMitarbeiter } from "@/lib/session";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 import { cateringAuftragAnlegen } from "../actions";
 
 const FEHLERMELDUNGEN: Record<string, string> = {
@@ -16,7 +17,7 @@ export default async function CateringNeuPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const aktiver = await getAktiverMitarbeiter();
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
   if (aktiver.rolle === "BEDIENUNG") redirect("/");
 
   const { error } = await searchParams;
@@ -163,9 +164,9 @@ export default async function CateringNeuPage({
           >
             Catering-Auftrag anlegen
           </button>
-          <a href="/catering" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900">
+          <Link href="/catering" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900">
             Abbrechen
-          </a>
+          </Link>
         </div>
       </form>
     </div>

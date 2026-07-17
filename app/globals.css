@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f9f9;
+  --foreground: #0f2e2c;
 }
 
 @theme inline {
@@ -10,6 +10,39 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-fraunces);
+}
+
+/* ─── Amalfi-Palette: Tiefes Teal (Primär) + Senfgelb (Akzent) ──── */
+/* Ersetzt die neutrale Standard-Tailwind-Grauskala durch warme,
+   blaugrün-getönte Neutraltöne; gray-900 trägt die Markenfarbe
+   (Buttons, Überschriften, Fokus-Ringe) — betrifft die ganze App,
+   ohne dass einzelne Seiten angepasst werden müssen. */
+@theme {
+  --color-gray-50: #f7f9f9;
+  --color-gray-100: #eaf1f0;
+  --color-gray-200: #d8e2e0;
+  --color-gray-300: #b7c9c6;
+  --color-gray-400: #8aa19e;
+  --color-gray-500: #5f7d7a;
+  --color-gray-600: #3f6360;
+  --color-gray-700: #164e49;
+  --color-gray-800: #0f3c38;
+  --color-gray-900: #0f5c5c;
+
+  /* Senfgelb-Akzent statt Standard-Amber (Hinweise, Bella-Card, TSE, Warnungen) */
+  --color-amber-50: #fdf8ec;
+  --color-amber-100: #f8ecc9;
+  --color-amber-200: #f0dda0;
+  --color-amber-400: #e0b845;
+  --color-amber-500: #d4a017;
+  --color-amber-600: #b8890f;
+  --color-amber-700: #96700c;
+  --color-amber-800: #7a5a0a;
+
+  /* Weichere, einladendere Ecken statt kantiger Formular-Optik */
+  --radius-md: 0.6rem;
+  --radius-lg: 0.9rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +55,49 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Warme Serifen-Überschriften (Trattoria-Charakter), unabhängig von
+   Tailwind-Klassen pro Seite — greift global auf jedes <h1>. */
+h1 {
+  font-family: var(--font-heading), Georgia, serif;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Weniger "Formular", mehr Einladung ──────────────────────────
+   Statt jede Seite einzeln anzufassen: die App nutzt durchgängig
+   dieselben Utility-Kombinationen für Karten und Haupt-Buttons —
+   hier gezielt mit sanftem Schatten + Hover-Feedback ausgestattet. */
+
+/* Karten (border-gray-200 rounded-lg bg-white — Listen, Formulare, Kacheln) */
+.border-gray-200.rounded-lg {
+  box-shadow: 0 1px 2px rgba(15, 60, 56, 0.05), 0 1px 1px rgba(15, 60, 56, 0.03);
+  transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+/* Klickbare Kacheln (z. B. Startseite) heben sich beim Hover sanft an */
+a.border-gray-200.rounded-lg:hover {
+  box-shadow: 0 8px 20px rgba(15, 60, 56, 0.1), 0 2px 6px rgba(15, 60, 56, 0.06);
+  transform: translateY(-2px);
+  border-color: var(--color-gray-300);
+}
+
+/* Primäre Buttons (bg-gray-900 ... rounded-md) — Schatten + Lift statt reinem Farbwechsel */
+.bg-gray-900.rounded-md {
+  box-shadow: 0 1px 2px rgba(15, 60, 56, 0.15);
+  transition: box-shadow 0.15s ease, transform 0.1s ease, background-color 0.15s ease;
+}
+.bg-gray-900.rounded-md:hover {
+  box-shadow: 0 4px 12px rgba(15, 60, 56, 0.22);
+  transform: translateY(-1px);
+}
+.bg-gray-900.rounded-md:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(15, 60, 56, 0.15);
+}
+
+/* Sanftere Farbübergänge überall, wo bereits hover:-Klassen genutzt werden */
+a, button {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }

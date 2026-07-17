@@ -18,7 +18,7 @@ export default async function TrinkgeldPage({
   }>;
 }) {
   const aktiver = await getAktiverMitarbeiter();
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
   if (aktiver.rolle === "BEDIENUNG") redirect("/");
 
   const { datum: datumParam, standort_id: standortIdParam, error, bestaetigt } =

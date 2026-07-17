@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
+import { Fraunces } from "next/font/google";
 import Link from "next/link";
 import { getAktiverMitarbeiter } from "@/lib/session";
+import { NavLink } from "./NavLink";
 import "./globals.css";
 
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   title: "Bella Vista",
@@ -19,62 +27,34 @@ export default async function RootLayout({
   const aktiver = await getAktiverMitarbeiter();
 
   const rolleBadge: Record<string, string> = {
-    CHEF: "bg-purple-100 text-purple-700",
-    MANAGER: "bg-blue-100 text-blue-700",
-    BEDIENUNG: "bg-gray-100 text-gray-600",
+    CHEF: "bg-amber-400/90 text-teal-950",
+    MANAGER: "bg-white/20 text-white",
+    BEDIENUNG: "bg-white/10 text-teal-100",
   };
 
   return (
-    <html lang="de" className={`${geist.variable} h-full antialiased`}>
+    <html
+      lang="de"
+      className={`${geist.variable} ${fraunces.variable} h-full antialiased`}
+    >
       <body className="min-h-full flex flex-col bg-gray-50">
-        <nav className="bg-white border-b border-gray-200 px-6 py-3 flex items-center gap-6">
-          <Link href="/" className="font-semibold text-gray-900 hover:text-gray-700">
-            Bella Vista
-          </Link>
+        <nav className="bg-gradient-to-r from-teal-900 to-teal-800 shadow-md px-6 py-3 flex items-center gap-1.5">
           <Link
-            href="/gaeste"
-            className="text-sm text-gray-600 hover:text-gray-900"
+            href="/"
+            className="font-heading text-xl font-semibold text-white tracking-tight mr-4 flex items-center gap-2"
           >
-            Gäste
+            <span>🌊</span> Bella Vista
           </Link>
-          <Link
-            href="/tische"
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            Tische
-          </Link>
-          <Link
-            href="/reservierungen"
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            Reservierungen
-          </Link>
-          <Link
-            href="/speisekarte"
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            Speisekarte
-          </Link>
-          <Link
-            href="/bestellungen"
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            Bestellungen
-          </Link>
-          <Link
-            href="/mitarbeiter"
-            className="text-sm text-gray-600 hover:text-gray-900"
-          >
-            Mitarbeiter
-          </Link>
+          <NavLink href="/gaeste">🧑‍🤝‍🧑 Gäste</NavLink>
+          <NavLink href="/tische">🪑 Tische</NavLink>
+          <NavLink href="/reservierungen">📅 Reservierungen</NavLink>
+          <NavLink href="/speisekarte">🍝 Speisekarte</NavLink>
+          <NavLink href="/bestellungen">🧾 Bestellungen</NavLink>
+          <NavLink href="/catering">🎉 Catering</NavLink>
+          <NavLink href="/mitarbeiter">👤 Mitarbeiter</NavLink>
           {/* BV-017: Dashboard nur für CHEF und MANAGER */}
           {aktiver && aktiver.rolle !== "BEDIENUNG" && (
-            <Link
-              href="/dashboard"
-              className="text-sm text-gray-600 hover:text-gray-900"
-            >
-              Dashboard
-            </Link>
+            <NavLink href="/dashboard">📊 Dashboard</NavLink>
           )}
 
           {/* BV-016: Session-Anzeige in Nav */}
@@ -82,11 +62,11 @@ export default async function RootLayout({
             {aktiver ? (
               <Link
                 href="/"
-                className="flex items-center gap-1.5 text-xs text-gray-600 hover:text-gray-900"
+                className="flex items-center gap-1.5 text-xs text-teal-100 hover:text-white"
               >
                 <span
-                  className={`px-1.5 py-0.5 rounded ${
-                    rolleBadge[aktiver.rolle] ?? "bg-gray-100 text-gray-500"
+                  className={`px-1.5 py-0.5 rounded font-medium ${
+                    rolleBadge[aktiver.rolle] ?? "bg-white/10 text-teal-100"
                   }`}
                 >
                   {aktiver.rolle}
@@ -98,14 +78,14 @@ export default async function RootLayout({
             ) : (
               <Link
                 href="/"
-                className="text-xs text-amber-600 hover:text-amber-800"
+                className="text-xs text-amber-300 hover:text-amber-200 font-medium"
               >
                 Nicht angemeldet →
               </Link>
             )}
           </div>
         </nav>
-        <main className="flex-1 px-6 py-6">{children}</main>
+        <main className="flex-1 px-6 py-8">{children}</main>
       </body>
     </html>
   );

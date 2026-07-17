@@ -6,7 +6,7 @@ import { faelligeErinnerungenVersenden } from "./actions";
 // BV-101: SMS-Erinnerung am Vortag (BR #22) — simulierter Versand
 export default async function ErinnerungenPage() {
   const aktiver = await getAktiverMitarbeiter();
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
   if (aktiver.rolle === "BEDIENUNG") redirect("/");
 
   const standortFilter =

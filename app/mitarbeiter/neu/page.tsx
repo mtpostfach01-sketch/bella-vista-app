@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import Link from "next/link";
 import { mitarbeiterAnlegen } from "../actions";
 
 export default async function MitarbeiterNeuPage() {
@@ -88,12 +89,12 @@ export default async function MitarbeiterNeuPage() {
           >
             Speichern
           </button>
-          <a
+          <Link
             href="/mitarbeiter"
             className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
           >
             Abbrechen
-          </a>
+          </Link>
         </div>
       </form>
     </div>

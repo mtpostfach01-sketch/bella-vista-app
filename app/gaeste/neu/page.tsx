@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { gastAnlegen } from "../actions";
 
 export default function GastNeuPage() {
@@ -75,9 +76,9 @@ export default function GastNeuPage() {
           >
             Speichern
           </button>
-          <a href="/gaeste" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900">
+          <Link href="/gaeste" className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900">
             Abbrechen
-          </a>
+          </Link>
         </div>
       </form>
     </div>

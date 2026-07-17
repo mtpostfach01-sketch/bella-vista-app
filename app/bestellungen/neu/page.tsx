@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import Link from "next/link";
 import { bestellungAnlegen } from "../actions";
 import { BestellartAuswahl } from "./BestellartAuswahl";
 
@@ -121,9 +122,9 @@ export default async function BestellungNeuPage({
           {speisekarten.length === 0 ? (
             <p className="text-xs text-gray-400">
               Keine Speisekarte vorhanden.{" "}
-              <a href="/speisekarte/kategorien/neu" className="underline">
+              <Link href="/speisekarte/kategorien/neu" className="underline">
                 Speisekarte anlegen →
-              </a>
+              </Link>
             </p>
           ) : (
             <div className="space-y-3 border border-gray-200 rounded-lg p-3 bg-gray-50">
@@ -176,12 +177,12 @@ export default async function BestellungNeuPage({
           >
             Bestellung aufnehmen
           </button>
-          <a
+          <Link
             href="/bestellungen"
             className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
           >
             Abbrechen
-          </a>
+          </Link>
         </div>
       </form>
     </div>

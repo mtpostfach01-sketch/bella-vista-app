@@ -66,7 +66,7 @@ export async function cateringAuftragBestaetigen(id: number) {
   if (!auftrag) redirect("/catering?error=nicht_gefunden");
 
   const aktiver = await getAktiverMitarbeiter();
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
 
   await db.cateringAuftrag.update({
     where: { id },

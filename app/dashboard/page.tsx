@@ -7,7 +7,7 @@ export default async function DashboardPage() {
   const aktiver = await getAktiverMitarbeiter();
 
   // BV-016: BEDIENUNG hat keinen Zugriff
-  if (!aktiver) redirect("/session");
+  if (!aktiver) redirect("/?error=keine_session");
   if (aktiver.rolle === "BEDIENUNG") redirect("/");
 
   // Zeitraum: Heute (00:00 – 23:59:59)

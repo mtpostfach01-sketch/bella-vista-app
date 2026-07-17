@@ -1,5 +1,7 @@
 import { db } from "@/lib/db";
+import Link from "next/link";
 import { reservierungAnlegen } from "../actions";
+import { PersonenanzahlUndGruppenmenue } from "./PersonenanzahlUndGruppenmenue";
 
 const FEHLERMELDUNGEN: Record<string, string> = {
   doppelbelegung:
@@ -80,20 +82,20 @@ export default async function ReservierungNeuPage({
             Suchen
           </button>
           {telefon && (
-            <a
+            <Link
               href="/reservierungen/neu"
               className="px-3 py-2 text-sm text-gray-500 hover:text-gray-900"
             >
               Alle
-            </a>
+            </Link>
           )}
         </form>
         {telefon && gaeste.length === 0 && (
           <p className="text-xs text-gray-400 mt-2">
             Kein Gast gefunden.{" "}
-            <a href="/gaeste/neu" className="underline hover:text-gray-700">
+            <Link href="/gaeste/neu" className="underline hover:text-gray-700">
               Neuen Gast anlegen →
-            </a>
+            </Link>
           </p>
         )}
       </div>
@@ -199,19 +201,7 @@ export default async function ReservierungNeuPage({
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Personenanzahl *
-          </label>
-          <input
-            name="personenanzahl"
-            type="number"
-            min={1}
-            required
-            defaultValue={2}
-            className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
-          />
-        </div>
+        <PersonenanzahlUndGruppenmenue gruppenmenues={gruppenmenues} />
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -224,43 +214,6 @@ export default async function ReservierungNeuPage({
           />
         </div>
 
-        {/* BV-105: Gruppenmenü + Anzahlung — ab BR #6-Schwellwert empfohlen, aber fallweise/optional (W7) */}
-        <fieldset className="border border-gray-200 rounded-lg p-3 space-y-3">
-          <legend className="text-xs text-gray-500 px-1">
-            Gruppen (ab 8 Personen empfohlen)
-          </legend>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Gruppenmenü (optional)
-            </label>
-            <select
-              name="gruppenmenue_id"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
-            >
-              <option value="">Kein Gruppenmenü (à la carte)</option>
-              {gruppenmenues.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.standort.name} — {g.bezeichnung} ({g.fixpreis.toFixed(2)} €,
-                  ab {g.ab_personenzahl} Pers.)
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Anzahlung (€, optional — fallweise, BR #23)
-            </label>
-            <input
-              name="anzahlung_betrag"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="0.00"
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
-            />
-          </div>
-        </fieldset>
-
         <div className="flex gap-3 pt-2">
           <button
             type="submit"
@@ -268,12 +221,12 @@ export default async function ReservierungNeuPage({
           >
             Speichern
           </button>
-          <a
+          <Link
             href="/reservierungen"
             className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900"
           >
             Abbrechen
-          </a>
+          </Link>
         </div>
       </form>
     </div>

@@ -27,16 +27,18 @@ export default async function Home({
   });
 
   const rolleBadge: Record<string, string> = {
-    CHEF: "bg-purple-100 text-purple-700",
-    MANAGER: "bg-blue-100 text-blue-700",
-    BEDIENUNG: "bg-gray-100 text-gray-600",
+    CHEF: "bg-amber-100 text-amber-800",
+    MANAGER: "bg-gray-100 text-gray-700",
+    BEDIENUNG: "bg-gray-100 text-gray-500",
   };
 
   return (
     <div className="max-w-lg">
-      <h1 className="text-2xl font-semibold text-gray-900 mb-2">Bella Vista</h1>
+      <h1 className="text-3xl font-semibold text-gray-900 mb-2">
+        Buongiorno! 👋
+      </h1>
       <p className="text-gray-500 mb-6">
-        Interne Restaurantverwaltung · Kreuzberg &amp; Spandau
+        Bella Vista — Kreuzberg &amp; Spandau
       </p>
 
       {/* Fehlermeldung */}
@@ -47,9 +49,9 @@ export default async function Home({
       )}
 
       {/* BV-016: Session-Anzeige */}
-      <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-white">
-        <h2 className="text-sm font-semibold text-gray-700 mb-3">
-          Angemeldeter Mitarbeiter
+      <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-white border-l-4 border-l-gray-900">
+        <h2 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-1.5">
+          <span>👋</span> Angemeldeter Mitarbeiter
         </h2>
         {aktiver ? (
           <div>
@@ -58,7 +60,7 @@ export default async function Home({
                 {aktiver.vorname} {aktiver.nachname}
               </span>
               <span
-                className={`text-xs px-1.5 py-0.5 rounded ${
+                className={`text-xs px-1.5 py-0.5 rounded-full ${
                   rolleBadge[aktiver.rolle] ?? "bg-gray-100 text-gray-500"
                 }`}
               >
@@ -84,7 +86,7 @@ export default async function Home({
           </div>
         ) : (
           <p className="text-sm text-gray-400 mb-3">
-            Noch kein Mitarbeiter ausgewählt.
+            Noch kein Mitarbeiter ausgewählt — wähle unten aus, um loszulegen.
           </p>
         )}
 
@@ -114,9 +116,9 @@ export default async function Home({
         ) : (
           <p className="text-xs text-gray-400 mt-2">
             Noch keine Mitarbeiter angelegt.{" "}
-            <a href="/mitarbeiter/neu" className="underline hover:text-gray-700">
+            <Link href="/mitarbeiter/neu" className="underline hover:text-gray-700">
               Mitarbeiter anlegen →
-            </a>
+            </Link>
           </p>
         )}
       </div>
@@ -125,45 +127,59 @@ export default async function Home({
       <div className="grid grid-cols-2 gap-3">
         <Link
           href="/gaeste"
-          className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300"
+          className="block p-4 bg-white rounded-lg border border-gray-200"
         >
+          <div className="text-2xl mb-1">🧑‍🤝‍🧑</div>
           <div className="font-medium text-gray-900">Gäste</div>
-          <div className="text-sm text-gray-500 mt-1">Anlegen &amp; suchen</div>
+          <div className="text-sm text-gray-500 mt-0.5">Anlegen &amp; suchen</div>
         </Link>
         <Link
           href="/reservierungen"
-          className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300"
+          className="block p-4 bg-white rounded-lg border border-gray-200"
         >
+          <div className="text-2xl mb-1">📅</div>
           <div className="font-medium text-gray-900">Reservierungen</div>
-          <div className="text-sm text-gray-500 mt-1">Heute &amp; kommende</div>
+          <div className="text-sm text-gray-500 mt-0.5">Heute &amp; kommende</div>
         </Link>
         <Link
           href="/bestellungen"
-          className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300"
+          className="block p-4 bg-white rounded-lg border border-gray-200"
         >
+          <div className="text-2xl mb-1">🧾</div>
           <div className="font-medium text-gray-900">Bestellungen</div>
-          <div className="text-sm text-gray-500 mt-1">Tisch aufnehmen</div>
+          <div className="text-sm text-gray-500 mt-0.5">Tisch aufnehmen</div>
         </Link>
         <Link
           href="/speisekarte"
-          className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300"
+          className="block p-4 bg-white rounded-lg border border-gray-200"
         >
+          <div className="text-2xl mb-1">🍝</div>
           <div className="font-medium text-gray-900">Speisekarte</div>
-          <div className="text-sm text-gray-500 mt-1">Gerichte verwalten</div>
+          <div className="text-sm text-gray-500 mt-0.5">Gerichte verwalten</div>
         </Link>
         <Link
           href="/tische"
-          className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300"
+          className="block p-4 bg-white rounded-lg border border-gray-200"
         >
+          <div className="text-2xl mb-1">🪑</div>
           <div className="font-medium text-gray-900">Tische</div>
-          <div className="text-sm text-gray-500 mt-1">Status &amp; Bereiche</div>
+          <div className="text-sm text-gray-500 mt-0.5">Status &amp; Bereiche</div>
+        </Link>
+        <Link
+          href="/catering"
+          className="block p-4 bg-white rounded-lg border border-gray-200"
+        >
+          <div className="text-2xl mb-1">🎉</div>
+          <div className="font-medium text-gray-900">Catering</div>
+          <div className="text-sm text-gray-500 mt-0.5">Events &amp; Firmenkunden</div>
         </Link>
         <Link
           href="/mitarbeiter"
-          className="block p-4 bg-white rounded-lg border border-gray-200 hover:border-gray-300"
+          className="block p-4 bg-white rounded-lg border border-gray-200"
         >
+          <div className="text-2xl mb-1">👤</div>
           <div className="font-medium text-gray-900">Mitarbeiter</div>
-          <div className="text-sm text-gray-500 mt-1">Team verwalten</div>
+          <div className="text-sm text-gray-500 mt-0.5">Team verwalten</div>
         </Link>
       </div>
     </div>
