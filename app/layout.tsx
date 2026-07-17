@@ -4,6 +4,7 @@ import { Fraunces } from "next/font/google";
 import Link from "next/link";
 import { getAktiverMitarbeiter } from "@/lib/session";
 import { NavLink } from "./NavLink";
+import { Logo } from "./Logo";
 import "./globals.css";
 
 const geist = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -43,7 +44,8 @@ export default async function RootLayout({
             href="/"
             className="font-heading text-xl font-semibold text-white tracking-tight mr-4 flex items-center gap-2"
           >
-            <span>🌊</span> Bella Vista
+            <Logo className="w-6 h-6 text-amber-400" />
+            Bella Vista
           </Link>
           <NavLink href="/gaeste">🧑‍🤝‍🧑 Gäste</NavLink>
           <NavLink href="/tische">🪑 Tische</NavLink>
