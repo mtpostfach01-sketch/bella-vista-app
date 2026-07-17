@@ -3,6 +3,7 @@ import { getAktiverMitarbeiter } from "@/lib/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { cateringAuftragAnlegen } from "../actions";
+import { MengenStepper } from "../../MengenStepper";
 
 const FEHLERMELDUNGEN: Record<string, string> = {
   pflichtfelder: "Bitte alle Pflichtfelder ausfüllen.",
@@ -103,7 +104,7 @@ export default async function CateringNeuPage({
           </select>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Eventdatum *
@@ -135,7 +136,10 @@ export default async function CateringNeuPage({
             {speisekarten.map((karte) =>
               karte.kategorien.map((kat) =>
                 kat.gerichte.map((g) => (
-                  <div key={g.id} className="flex items-center gap-3">
+                  <div
+                    key={g.id}
+                    className="flex items-center justify-between gap-3 py-1"
+                  >
                     <span className="flex-1 text-sm text-gray-700">
                       {karte.standort.name} — {g.name}
                       <span className="ml-1 text-xs text-gray-400">
@@ -143,13 +147,7 @@ export default async function CateringNeuPage({
                       </span>
                     </span>
                     <input type="hidden" name="gericht_id" value={g.id} />
-                    <input
-                      type="number"
-                      name="menge"
-                      min={0}
-                      defaultValue={0}
-                      className="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-gray-900"
-                    />
+                    <MengenStepper name="menge" />
                   </div>
                 ))
               )

@@ -2,6 +2,7 @@ import { db } from "@/lib/db";
 import Link from "next/link";
 import { bestellungAnlegen } from "../actions";
 import { BestellartAuswahl } from "./BestellartAuswahl";
+import { MengenStepper } from "../../MengenStepper";
 
 const FEHLERMELDUNGEN: Record<string, string> = {
   kueche_geschlossen:
@@ -131,7 +132,10 @@ export default async function BestellungNeuPage({
               {speisekarten.map((karte) =>
                 karte.kategorien.map((kat) =>
                   kat.gerichte.map((g) => (
-                    <div key={g.id} className="flex items-center gap-3">
+                    <div
+                      key={g.id}
+                      className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 py-1.5 border-b border-gray-200 last:border-0 sm:border-0"
+                    >
                       <span className="flex-1 text-sm text-gray-700">
                         {karte.standort.name} — {g.name}
                         <span className="ml-1 text-xs text-gray-400">
@@ -144,21 +148,17 @@ export default async function BestellungNeuPage({
                           </span>
                         )}
                       </span>
-                      {/* verstecktes Feld: gericht_id */}
-                      <input type="hidden" name="gericht_id" value={g.id} />
-                      <input
-                        type="number"
-                        name="menge"
-                        min={0}
-                        defaultValue={0}
-                        className="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md text-center focus:outline-none focus:ring-2 focus:ring-gray-900"
-                      />
-                      <input
-                        type="text"
-                        name="pos_notiz"
-                        placeholder="Notiz"
-                        className="w-28 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
-                      />
+                      <div className="flex items-center gap-2">
+                        {/* verstecktes Feld: gericht_id */}
+                        <input type="hidden" name="gericht_id" value={g.id} />
+                        <MengenStepper name="menge" />
+                        <input
+                          type="text"
+                          name="pos_notiz"
+                          placeholder="Notiz"
+                          className="flex-1 sm:w-28 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-900"
+                        />
+                      </div>
                     </div>
                   ))
                 )

@@ -124,6 +124,7 @@ export default async function KennzahlenPage() {
           {topGerichte.length === 0 ? (
             <p className="text-sm text-gray-400">Keine Daten vorhanden.</p>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-gray-500 border-b border-gray-100">
@@ -144,6 +145,7 @@ export default async function KennzahlenPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </section>
 
@@ -233,6 +235,7 @@ export default async function KennzahlenPage() {
           {topGaeste.length === 0 ? (
             <p className="text-sm text-gray-400">Keine Gäste vorhanden.</p>
           ) : (
+            <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-xs text-gray-500 border-b border-gray-100">
@@ -267,6 +270,7 @@ export default async function KennzahlenPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </section>
       </div>
