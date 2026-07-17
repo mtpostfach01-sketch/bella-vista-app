@@ -114,7 +114,9 @@ export default async function ReservierungNeuPage({
             {gaeste.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.vorname} {g.nachname} · {g.telefon}
-                {g.bella_card ? " · Bella-Card" : ""}
+                {g.bella_card
+                  ? " · Bella-Card"
+                  : ` · ${g.besuchsanzahl} Besuche`}
               </option>
             ))}
           </select>

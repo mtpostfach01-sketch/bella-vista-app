@@ -65,13 +65,20 @@ export default async function GaestePage({
               <div>
                 <div className="font-medium text-gray-900">
                   {g.vorname} {g.nachname}
-                  {g.bella_card && (
+                  {g.bella_card ? (
                     <span className="ml-2 text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
                       Bella-Card
                     </span>
+                  ) : (
+                    <span className="ml-2 text-xs text-gray-400">
+                      noch {Math.max(0, 10 - g.besuchsanzahl)}× bis Bella-Card
+                    </span>
                   )}
                 </div>
-                <div className="text-sm text-gray-500">{g.telefon}</div>
+                <div className="text-sm text-gray-500">
+                  {g.telefon}
+                  <span className="text-gray-400"> · {g.besuchsanzahl} Besuche</span>
+                </div>
                 {g.notiz && (
                   <div className="text-xs text-gray-400 mt-0.5">{g.notiz}</div>
                 )}

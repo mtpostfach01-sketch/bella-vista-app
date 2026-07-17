@@ -31,9 +31,10 @@ Positionskategorien.
 **Konfidenz:** 9/10
 
 **Wie geprüft?** Code-Review `rechnungErstellen` in
-`app/bestellungen/actions.ts` (Zeile 191–225): `besuchsanzahl >= 10` setzt
-`bella_card = true`; der Rabatt wird pauschal auf `summe * 0.85`
-(alle Positionen ungefiltert) berechnet, keine Kategorie-Ausnahme im Code.
+`app/bestellungen/actions.ts` (Zeile 173–226): `besuchsanzahl >= 10` setzt
+`bella_card = true` (Zeile 220–225); der Rabatt wird pauschal auf
+`summe * 0.85` (Zeile 198–199, alle Positionen ungefiltert) berechnet,
+keine Kategorie-Ausnahme im Code.
 
 ---
 
