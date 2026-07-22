@@ -48,3 +48,9 @@ yarn-error.log*
 next-env.d.ts
 
 /app/generated/prisma
+
+# lokale Ablage, nicht Teil der Abgabe (Kursfolien, Kunden-Rohdaten, Secrets)
+/github-recovery-codes.txt
+/SPEC.md
+/*.pdf
+/*.docx
