@@ -1,7 +1,7 @@
 /**
- * Session-Hilfsfunktionen (BV-016)
- * Cookie-basierte Mitarbeiter-Auswahl (ohne echtes Passwort-Login).
- * Speichert mitarbeiter_id und mitarbeiter_rolle in Cookies.
+ * Session-Hilfsfunktionen (BV-016, ADR-010)
+ * Cookie-basierte Mitarbeiter-Session, per Passwort abgesichert.
+ * Speichert mitarbeiter_id in Cookies; proxy.ts erzwingt eine gültige Session.
  */
 
 import { cookies } from "next/headers";
@@ -15,11 +15,4 @@ export async function getAktiverMitarbeiter() {
     where: { id: Number(id) },
     include: { standort: true },
   });
-}
-
-export function getRolleAusCookie(): string | null {
-  // Synchrone Variante für Middleware (Edge) — liest aus dem Cookie-Header
-  // Wird in lib/session.ts nur deklariert; tatsächliche Middleware nutzt
-  // request.cookies direkt.
-  return null;
 }
