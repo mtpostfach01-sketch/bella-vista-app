@@ -29,7 +29,8 @@ npm install
 # 2. Datenbank erstellen
 npx prisma db push
 
-# 3. Stammdaten laden (Standorte, Bereiche, Allergene)
+# 3. Stammdaten + Demodaten laden (Standorte, Bereiche, Tische, Speisekarten,
+#    Mitarbeiter, Allergene — inkl. der 5 in KALIBRIERUNG.md geprüften Beispiele)
 npx prisma db seed
 ```
 
@@ -43,7 +44,9 @@ App läuft auf `http://localhost:3000`.
 
 **Erster Schritt nach dem Start:** Auf der Startseite einen Mitarbeiter anlegen (`/mitarbeiter/neu`, mit Passwort) und dann über das Auswahl-Widget mit Passwort anmelden. Ohne gültiges Passwort ist keine Seite außer der Startseite erreichbar (BV-016).
 
-Falls die App mit den Demo-Daten läuft: Standard-Passwort für alle vorhandenen Test-Mitarbeiter ist `bellavista`.
+Nach `npx prisma db seed` existieren bereits zwei Mitarbeiter — Marco Ferretti (CHEF) und Thomas Schmidt (BEDIENUNG), Passwort für beide: `bellavista`.
+
+**Kalibrierungs-Demodaten:** `npx prisma db seed` legt außerdem exakt die Datensätze an, auf die sich `KALIBRIERUNG.md` bezieht: Gast „Klaus Bergmann" (`/gaeste/2`), Catering-Auftrag „TechCorp GmbH" (`/catering/1`) und die zugehörigen Bestellungen/Rechnungen — reproduzierbar bei jedem frischen Setup.
 
 ---
 
@@ -53,7 +56,7 @@ Falls die App mit den Demo-Daten läuft: Standard-Passwort für alle vorhandenen
 bella-vista-app/
 ├── prisma/
 │   ├── schema.prisma      # Datenmodell (25 Modelle, SQLite)
-│   └── seed.ts            # Stammdaten: Standorte, Bereiche, Allergene
+│   └── seed.ts            # Stammdaten + Kalibrierungs-Demodaten (reproduzierbar)
 ├── app/                   # Next.js App Router
 │   ├── gaeste/            # BV-001 Gäste-CRUD
 │   ├── tische/            # BV-002 Tische je Standort
@@ -74,10 +77,10 @@ bella-vista-app/
 ├── docs/
 │   ├── spec.md            # Anforderungsmodell (25 Entitäten, 23 Business Rules, 9 Widersprüche)
 │   ├── backlog.md         # Feature-Register BV-001–BV-109 (alle Phasen abgeschlossen)
-│   ├── decisions.md       # Architekturentscheidungen (ADR-001–ADR-008)
+│   ├── decisions.md       # Architekturentscheidungen (ADR-001–ADR-010)
 │   └── architecture.md   # Stack & Datenmodell
 ├── KALIBRIERUNG.md         # 5 geprüfte Aussagen zur App (Kalibrierungs-Bewertung)
-└── CLAUDE.md              # Agent-Briefing
+└── CLAUDE.md / AGENTS.md  # Projekt-Vertrag (Stack, Prinzipien, Doku-Referenzen)
 ```
 
 ---

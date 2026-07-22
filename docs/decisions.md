@@ -202,3 +202,36 @@ Praxis wirkungslos, da die "Anmeldung" keine echte Hürde war.
 das eigentliche Problem (Rollen-Mogeln) behebt, ohne die Architektur zu
 verkomplizieren. Vorhandene Demo-Mitarbeiter wurden nachträglich mit dem
 Passwort `bellavista` versehen (siehe README).
+
+---
+
+## ADR-011 — Kalibrierungs-Demodaten im Seed-Script statt in lokaler DB
+
+**Status:** Entschieden (Juli 2026)
+**Kontext:** Die 5 Aussagen in `KALIBRIERUNG.md` verwiesen ursprünglich auf
+konkrete Datensätze (Gast „Klaus Bergmann", Catering-Auftrag „TechCorp"),
+die manuell in der lokalen `prisma/dev.db` angelegt worden waren.
+`dev.db` ist per `.gitignore` nicht im Repo, und `prisma/seed.ts` legte
+nur Standorte/Bereiche/Allergene an — bei einem frischen Checkout +
+`npx prisma db seed` existierten die in `KALIBRIERUNG.md` referenzierten
+IDs (`/gaeste/2`, `/catering/1`) also gar nicht.
+
+**Entscheidung:** `prisma/seed.ts` erzeugt jetzt zusätzlich alle Datensätze,
+auf die sich `KALIBRIERUNG.md` konkret bezieht — Speisekarten inkl.
+„Bistecca alla Fiorentina" als Gericht-ID 8 (nur Kreuzberg), Mitarbeiter
+Marco Ferretti/Thomas Schmidt, Gast Klaus Bergmann als Gast-ID 2, den
+TechCorp-Catering-Auftrag als Auftrag-ID 1 sowie die zugehörigen
+Bestellungen/Rechnungen mit exakt den in `KALIBRIERUNG.md` genannten
+Beträgen. Der Block ist über einen Existenz-Check (Bergmanns
+Telefonnummer) idempotent — mehrfaches Seeding legt ihn nicht doppelt an.
+
+**Begründung:** Kalibrierungs-Konfidenz von 9–10 auf allen 5 Aussagen ist
+eine Alles-oder-nichts-Wette (KALIBRIERUNG-Briefing: falsch trotz hoher
+Konfidenz = 0 statt 1 Punkt). Ohne reproduzierbare Demodaten wäre die
+konkrete Beleglage der Aussagen bei der Prüfung nicht nachvollziehbar,
+selbst wenn die zugrunde liegende Business Rule im Code korrekt ist.
+
+**Konsequenz:** `npx prisma db seed` auf einem frischen Checkout erzeugt
+exakt den Zustand, den `KALIBRIERUNG.md` beschreibt — Gast-ID, Gericht-ID,
+Bestellungs-ID und alle Beträge sind bei jedem Seeding identisch
+reproduzierbar (siehe README, Abschnitt Setup).
